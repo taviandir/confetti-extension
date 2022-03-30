@@ -1,0 +1,22 @@
+{
+	"name": "CONfetti",
+	"description": "A set of improvements for the Conflict of Nations UI experience.",
+	"version": "1.0",
+	"manifest_version": 3,
+	"background": {
+		"service_worker": "background.js"
+	},
+	"permissions": ["storage", "activeTab", "scripting"],
+	"action": {
+		"default_popup": "popup.html"
+	},
+	"options_page": "options.html",
+	"host_permissions": ["*://*.conflictnations.com/*"],
+	"content_scripts": [
+		{
+			"matches": ["https://*.conflictnations.com/*"],
+			"all_frames": true,
+			"js": ["extension.js"]
+		}
+	]
+}
