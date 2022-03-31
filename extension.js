@@ -35,7 +35,7 @@ function initExtensionPlay() {
 
 function initDiplomacyWindow() {
 	var dipBtn = document.getElementById('func_btn_diplomacy');
-	$(dipBtn).on('click', onOpenDiplomacyWindow);
+	dipBtn.addEventListener('click', onOpenDiplomacyWindow);
 }
 
 function onOpenDiplomacyWindow() {
@@ -44,7 +44,7 @@ function onOpenDiplomacyWindow() {
 		// delay setting to give it time to load the UI
 
 		var messageTabEl = document.getElementById('func_tab_messages');
-		$(messageTabEl).on('click', onClickDiplomacyMessagesTab);
+		messageTabEl.addEventListener('click', onClickDiplomacyMessagesTab);
 	}, 2000);
 }
 
@@ -55,10 +55,10 @@ function onClickDiplomacyMessagesTab() {
 		setTimeout(() => {
 			var textAreaEl = document.getElementById('func_create_message_body');
 			if (textAreaEl) {
-				$(textAreaEl).keydown(function (e) {
+				textAreaEl.addEventListener('keydown', function (e) {
 					if (e.ctrlKey && (e.keyCode == 10 || e.keyCode == 13)) {
 						// Ctrl-Enter pressed
-						$('#func_send_message').click();
+						document.getElementById('func_send_message').click();
 					}
 				});
 				__enabledCtrlEnterSend = true;
@@ -86,12 +86,12 @@ function initExtensionMenuRow() {
 	svgWrapper.innerHTML = _buildingIconSvg;
 	svgWrapper.style = 'width: 100%; margin: 0.25rem';
 	ubLvlButtonEl.appendChild(svgWrapper);
-	$(ubLvlButtonEl).on('click', onClickMenuUnitBuildingLevel);
+	ubLvlButtonEl.addEventListener('click', onClickMenuUnitBuildingLevel);
 
 	// NOTES BUTTON
 	var notesButtonEl = addButtonToMenu(ulEl);
 	notesButtonEl.innerText = 'NOTES';
-	$(notesButtonEl).on('click', onClickMenuItemNotes);
+	notesButtonEl.addEventListener('click', onClickMenuItemNotes);
 }
 
 function addButtonToMenu(menuEl) {
@@ -134,7 +134,7 @@ function onClickMenuUnitBuildingLevel() {
 			if (arr.length) {
 				let tdHtml = ubArrayToHtml(arr);
 				var cellId = getUbTableCellId(key, lvl);
-				var tdMatch = $(tableEl).find('#' + cellId);
+				var tdMatch = tableEl.querySelectorAll('#' + cellId);
 				if (tdMatch.length) {
 					tdMatch[0].innerHTML = tdHtml;
 				}
@@ -175,7 +175,7 @@ function initUbLvlHeader() {
 	var headerWrapper = document.createElement('div');
 	headerWrapper.style = 'display: flex; align-items: space-between';
 	var closeButton = createPopupCloseButton();
-	$(closeButton).on('click', onClickCloseUbLvlWindow);
+	closeButton.addEventListener('click', onClickCloseUbLvlWindow);
 	var headerEl = document.createElement('h1');
 	headerEl.innerText = 'Units by Building Levels';
 	headerEl.style = 'margin-bottom: 0.5rem';
@@ -250,7 +250,7 @@ function onClickMenuItemNotes() {
 	cancelEl.innerText = 'Cancel';
 	cancelEl.className = 'con_button large_button uppercase';
 	cancelEl.style = 'margin-right: 0.5rem;';
-	$(cancelEl).on('click', onClickCancelNote);
+	cancelEl.addEventListener('click', onClickCancelNote);
 	buttonDiv.appendChild(cancelEl);
 
 	// save button
@@ -258,7 +258,7 @@ function onClickMenuItemNotes() {
 	saveEl.id = 'ExtNoteSave';
 	saveEl.innerText = 'Save';
 	saveEl.className = 'con_button large_button uppercase';
-	$(saveEl).on('click', onClickSaveNote);
+	saveEl.addEventListener('click', onClickSaveNote);
 	buttonDiv.appendChild(saveEl);
 
 	document.getElementById('s1914').appendChild(popupEl);
@@ -299,7 +299,7 @@ function hideTutorialAdvisor() {
 function hideGoldMarketing() {
 	var element = document.getElementById('marketingPopupContainer');
 
-	let m = $('#marketingPopupContainer .func_close_button');
+	let m = document.querySelectorAll('#marketingPopupContainer .func_close_button');
 	console.log('GOLD match', m);
 	if (m.length) {
 		m.click();
@@ -332,7 +332,7 @@ function initEventWindow() {
 
 function initOptionsInEventWindow() {
 	log('init event window!');
-	var eventContentElem = $('#eventsContainer .content .overview')[0];
+	var eventContentElem = document.querySelector('#eventsContainer .content .overview');
 	if (eventContentElem) {
 		// create a parent wrapper object for all filters
 		let wrapper = document.createElement('div');
@@ -347,7 +347,7 @@ function initOptionsInEventWindow() {
 
 function markUnreadEvents() {
 	console.log('Mark Unread Events', _unreadEvents);
-	let childrenOfUl = $('#eventsContainer .content .overview ul').children();
+	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
 	//console.log("children of ul", childrenOfUl, unreadEvents);
 	for (var i = 0; i < _unreadEvents; i++) {
 		var liElem = childrenOfUl[i];
@@ -358,16 +358,16 @@ function markUnreadEvents() {
 
 function enhanceAgentEvents() {
 	log('Enhance Agent Events');
-	let childrenOfUl = $('#eventsContainer .content .overview ul').children();
+	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
 	//console.log("children of ul", childrenOfUl, unreadEvents);
 	// console.log("AGENT childrenoful", childrenOfUl);
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
-		var desc = $(evEl).find('.event-description')[0];
+		var desc = evEl.querySelector('.event-description');
 		// console.log("event innertext", evEl, desc, desc.innerText);
 		if (desc.innerText.indexOf('Our agent') >= 0) {
 			// console.log("ENHANCE - our agent event", desc.innerText);
-			var headerEl = $(evEl).find('.event-time')[0];
+			var headerEl = evEl.querySelector('.event-time');
 			if (desc.innerText.indexOf('have intercepted') >= 0) {
 				// this is one of the "done to us"
 			} else if (desc.innerText.indexOf('has been captured') >= 0) {
@@ -387,10 +387,10 @@ function enhanceAgentEvents() {
 function addUnitTypeToResearchEvents() {
 	setTimeout(() => {
 		// console.log('addUnitTypeToResearchEvents()');
-		var eventElems = $('#eventsContainer .content .overview ul li');
+		var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
 		for (var i = 0; i < eventElems.length; i++) {
 			var evEl = eventElems[i];
-			var desc = $(evEl).find('.event-description');
+			var desc = evEl.querySelector('.event-description');
 			var content = '';
 			if (desc.length === 1) {
 				content = desc[0].innerText;
@@ -534,7 +534,7 @@ function onChangeFilters() {
 	var countryFilterValue = getEventFilterCountryValue();
 	// console.log("FILTER VALUES", { typeFilterValue, countryFilterValue });
 
-	var eventElems = $('#eventsContainer .content .overview ul li');
+	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
 
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
@@ -580,17 +580,17 @@ function addTypeFilterSelect(elem) {
 
 var _eventFilterTypeId = 'confetti-filter-type-select';
 function getEventFilterTypeValue() {
-	return $('#' + _eventFilterTypeId)[0].value;
+	return document.getElementById('' + _eventFilterTypeId)[0].value;
 }
 
 var _eventFilterCountryId = 'confetti-filter-country-select';
 function getEventFilterCountryValue() {
-	return $('#' + _eventFilterCountryId)[0].value;
+	return document.getElementById('' + _eventFilterCountryId)[0].value;
 }
 
 function evalFilterType(evEl, filter) {
 	if (!filter || filter == '' || filter == 'ALL') return true;
-	var desc = $(evEl).find('.event-description');
+	var desc = evEl.querySelector('.event-description');
 	var content = '';
 	if (desc.length === 1) {
 		content = desc[0].innerText;
@@ -660,13 +660,13 @@ function addCountryFilterSelect(elem) {
 
 function detectCountriesInEvents() {
 	// NOTE : THIS METHOD BOTH DETECTS COUNTRIES AND SETS [data-country] ATTR ON EVENT
-	var eventElems = $('#eventsContainer .content .overview ul li');
+	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
 	var filter = event.target.value;
 
 	var countriesLower = [];
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
-		var finds = $(evEl).find('.small_flag_container img');
+		var finds = evEl.querySelectorAll('.small_flag_container img');
 		if (finds.length === 0) continue;
 		var el = finds[0];
 		var imgSrc = el.getAttribute('src');
