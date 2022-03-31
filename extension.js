@@ -5,6 +5,11 @@
 
 	log('INIT');
 
+	let correctUrl = document.location.href.includes('con-client');
+	console.log('CORRECT URL?', { correctUrl, href: document.location.href });
+
+	if (!correctUrl) return;
+
 	// Determine when it's loaded by observing changes to splash screen attributes. When it is finished loading, style="display: none;" is added to this element.
 	var splashScreen = document.getElementById('splashScreenContainer');
 	var observer = new MutationObserver(function (mutations) {
@@ -535,12 +540,13 @@ function onChangeFilters() {
 	// console.log("FILTER VALUES", { typeFilterValue, countryFilterValue });
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
+	console.log('eventElems', { eventElems });
 
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
 		var typeOk = evalFilterType(evEl, typeFilterValue);
 		var countryOk = evalFilterCountry(evEl, countryFilterValue);
-		// console.log("EV FILTER RESULT", { evEl, typeOk, countryOk });
+		console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, typeFilterValue, countryFilterValue });
 
 		var show = typeOk && countryOk;
 		if (show) {
@@ -580,20 +586,21 @@ function addTypeFilterSelect(elem) {
 
 var _eventFilterTypeId = 'confetti-filter-type-select';
 function getEventFilterTypeValue() {
-	return document.getElementById('' + _eventFilterTypeId)[0].value;
+	return document.getElementById('' + _eventFilterTypeId).value;
 }
 
 var _eventFilterCountryId = 'confetti-filter-country-select';
 function getEventFilterCountryValue() {
-	return document.getElementById('' + _eventFilterCountryId)[0].value;
+	return document.getElementById('' + _eventFilterCountryId).value;
 }
 
 function evalFilterType(evEl, filter) {
 	if (!filter || filter == '' || filter == 'ALL') return true;
 	var desc = evEl.querySelector('.event-description');
 	var content = '';
-	if (desc.length === 1) {
-		content = desc[0].innerText;
+	// console.log('evalFilterType', { desc, filter });
+	if (desc) {
+		content = desc.innerText;
 	} else {
 		return true;
 	}
@@ -661,7 +668,7 @@ function addCountryFilterSelect(elem) {
 function detectCountriesInEvents() {
 	// NOTE : THIS METHOD BOTH DETECTS COUNTRIES AND SETS [data-country] ATTR ON EVENT
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
-	var filter = event.target.value;
+	// var filter = event.target.value;
 
 	var countriesLower = [];
 	for (var i = 0; i < eventElems.length; i++) {
