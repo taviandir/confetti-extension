@@ -540,13 +540,13 @@ function onChangeFilters() {
 	// console.log("FILTER VALUES", { typeFilterValue, countryFilterValue });
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
-	console.log('eventElems', { eventElems });
+	// console.log('eventElems', { eventElems });
 
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
 		var typeOk = evalFilterType(evEl, typeFilterValue);
 		var countryOk = evalFilterCountry(evEl, countryFilterValue);
-		console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, typeFilterValue, countryFilterValue });
+		// console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, typeFilterValue, countryFilterValue });
 
 		var show = typeOk && countryOk;
 		if (show) {
