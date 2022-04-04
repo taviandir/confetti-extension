@@ -32,7 +32,7 @@
 var __loaded = false;
 function initExtensionPlay() {
 	initEventWindow();
-	hideGoldMarketing();
+	// hideGoldMarketing();
 	hideTutorialAdvisor();
 	initExtensionMenuRow();
 	initDiplomacyWindow();
