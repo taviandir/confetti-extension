@@ -4,7 +4,7 @@ This is a tampermonkey script that enhances the UI experience in Conflict Of Nat
 
 ## Disclaimer
 
-This script in no ways alters data, does not intercept data sent to or from the CON servers. It merely tweaks the UI in various ways.
+This script in no ways alters data, does not intercept data sent to or from the CON servers. It merely tweaks the UI in various ways, by modifying the HTML in the browser.
 
 
 # Why
