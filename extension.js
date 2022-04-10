@@ -311,23 +311,13 @@ function hideGoldMarketing() {
 	}
 }
 
+var _unreadEventsSinceLastOpen = 0;
 var _unreadEvents = 0;
 function initEventWindow() {
+	initUnreadCountCheck();
 	var eventButton = document.getElementById('func_btn_events');
-
-	// extract the "Unread Events" value from the red circle
-	var unreadEventsElem = document.getElementById('func_events_unread');
-	if (unreadEventsElem) {
-		log('UNREAD EVENTS: ' + unreadEventsElem.innerText);
-		if (unreadEventsElem.innerText !== '') {
-			var unreadValue = parseInt(unreadEventsElem.innerText);
-			if (+unreadValue) {
-				_unreadEvents = +unreadValue;
-			}
-			console.log('unread as number', unreadValue, _unreadEvents);
-		}
-	}
 	eventButton.addEventListener('click', (event) => {
+		setEventsUnreadCount();
 		initOptionsInEventWindow();
 		markUnreadEvents();
 		addUnitTypeToResearchEvents();
@@ -335,8 +325,31 @@ function initEventWindow() {
 	});
 }
 
+function initUnreadCountCheck() {
+	log('init unread count checker');
+	var eventsBtnElem = document.getElementById('func_btn_events');
+	console.log('unread events elem', eventsBtnElem);
+	if (eventsBtnElem) {
+		eventsBtnElem.onmouseenter = function () {
+			var unreadEventsElem = document.getElementById('func_events_unread');
+			log('UNREAD EVENTS: ' + unreadEventsElem.innerText);
+			if (unreadEventsElem.innerText !== '') {
+				var unreadValue = parseInt(unreadEventsElem.innerText);
+				if (+unreadValue) {
+					_unreadEventsSinceLastOpen = +unreadValue;
+				}
+			}
+		};
+	}
+}
+
+function setEventsUnreadCount() {
+	_unreadEvents += _unreadEventsSinceLastOpen;
+	_unreadEventsSinceLastOpen = 0;
+}
+
 function initOptionsInEventWindow() {
-	log('init event window!');
+	// log('init event window!');
 	var eventContentElem = document.querySelector('#eventsContainer .content .overview');
 	if (eventContentElem) {
 		// create a parent wrapper object for all filters
