@@ -618,7 +618,7 @@ function evalFilterType(evEl, filter) {
 	} else if (filter === 'CIT') {
 		keywordsToSearchFor = ['built in', 'mobilized'];
 	} else if (filter === 'DIP') {
-		keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition'];
+		keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
 	}
 
 	if (keywordsToSearchFor && keywordsToSearchFor.length) {

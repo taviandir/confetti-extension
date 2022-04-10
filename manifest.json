@@ -1,7 +1,7 @@
 {
 	"name": "CONfetti",
 	"description": "A set of improvements for the Conflict of Nations UI experience.",
-	"version": "1.0",
+	"version": "1.0.1",
 	"manifest_version": 3,
 	"background": {
 		"service_worker": "background.js"
