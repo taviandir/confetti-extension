@@ -1,6 +1,6 @@
 # CONfetti - Make CON great again!
 
-This is a tampermonkey script that enhances the UI experience in Conflict Of Nations.
+This is the source code for the browser extension CONfetti.
 
 ## Disclaimer
 
@@ -9,6 +9,7 @@ This script in no ways alters data, does not intercept data sent to or from the 
 
 # Why
 
+This extensions aims to enhance the UI experience in Conflict Of Nations.
 I made this script to fix the issues that frustrates me and to add functionality I think is lacking and should already exist.
 
 
