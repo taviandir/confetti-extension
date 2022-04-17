@@ -625,7 +625,7 @@ function evalFilterType(evEl, filter) {
 	if (filter === 'COM') {
 		keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
 	} else if (filter === 'TER') {
-		keywordsToSearchFor = ['Province Entered', 'Territory Lost', 'Territory Conquered'];
+		keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
 	} else if (filter === 'AGE') {
 		keywordsToSearchFor = ['Agent'];
 	} else if (filter === 'RES') {
