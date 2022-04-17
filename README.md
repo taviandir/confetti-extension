@@ -31,8 +31,17 @@ I made this script to fix the issues that frustrates me and to add functionality
 
 - CTRL-Enter to send messages only works sometimes
 
-# Upcoming features / wishlist
 
-- Events: Agent missions clarification
-- Events: Freetext search
-- Show city morale details right away (if possible)
+# Upcoming features / Wishlist / Ideas
+
+-   Events:
+    -   Agent missions clarification (in progress)
+    -   Freetext search
+    -   More detailed combat filters (ground / naval / air / missiles, wins / losses)
+    -   Combat clarification (directions, e.g. I attacked X, or X attacked me - if possible)
+-   Show city morale details right away (if possible)
+-   Advanced Combat Report window
+-   Units By B-Level - officers, seasonal as optional includes
+-   Game Selector View: Force English language (so the extension works properly)
+
+
