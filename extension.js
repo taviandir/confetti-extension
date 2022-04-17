@@ -322,6 +322,7 @@ function initEventWindow() {
 		markUnreadEvents();
 		addUnitTypeToResearchEvents();
 		enhanceAgentEvents();
+		markFilterTypeOnEvents();
 	});
 }
 
@@ -400,6 +401,49 @@ function enhanceAgentEvents() {
 			// TODO : agent missions done on us
 		}
 	}
+}
+
+const EventFilterAttrName = 'data-filter-type';
+function markFilterTypeOnEvents() {
+	let filters = {
+		COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'],
+		TER: ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'],
+		AGE: ['Agent'],
+		RES: ['Research Completed'],
+		CIT: ['built in', 'mobilized'],
+		DIP: ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'],
+	};
+
+	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
+	for (let evEl of eventElems) {
+		var content = evEl.querySelector('.event-description').innerText;
+		for (let key in filters) {
+			let keywordsToSearchFor = filters[key];
+			let isMatch = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
+			if (isMatch) {
+				evEl.setAttribute(EventFilterAttrName, key);
+				break;
+			}
+		}
+	}
+
+	// if (filter === 'COM') {
+	// 	keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
+	// } else if (filter === 'TER') {
+	// 	keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
+	// } else if (filter === 'AGE') {
+	// 	keywordsToSearchFor = ['Agent'];
+	// } else if (filter === 'RES') {
+	// 	keywordsToSearchFor = ['Research Completed'];
+	// } else if (filter === 'CIT') {
+	// 	keywordsToSearchFor = ['built in', 'mobilized'];
+	// } else if (filter === 'DIP') {
+	// 	keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
+	// }
+
+	// if (keywordsToSearchFor && keywordsToSearchFor.length) {
+	// 	show = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
+	// }
 }
 
 function addUnitTypeToResearchEvents() {
@@ -620,27 +664,29 @@ function evalFilterType(evEl, filter) {
 		return true;
 	}
 
-	var show = true;
-	var keywordsToSearchFor;
-	if (filter === 'COM') {
-		keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
-	} else if (filter === 'TER') {
-		keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
-	} else if (filter === 'AGE') {
-		keywordsToSearchFor = ['Agent'];
-	} else if (filter === 'RES') {
-		keywordsToSearchFor = ['Research Completed'];
-	} else if (filter === 'CIT') {
-		keywordsToSearchFor = ['built in', 'mobilized'];
-	} else if (filter === 'DIP') {
-		keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
-	}
+	var value = evEl.getAttribute(EventFilterAttrName);
+	return value == filter;
 
-	if (keywordsToSearchFor && keywordsToSearchFor.length) {
-		show = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
-	}
+	// var show = true;
+	// var keywordsToSearchFor;
+	// if (filter === 'COM') {
+	// 	keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
+	// } else if (filter === 'TER') {
+	// 	keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
+	// } else if (filter === 'AGE') {
+	// 	keywordsToSearchFor = ['Agent'];
+	// } else if (filter === 'RES') {
+	// 	keywordsToSearchFor = ['Research Completed'];
+	// } else if (filter === 'CIT') {
+	// 	keywordsToSearchFor = ['built in', 'mobilized'];
+	// } else if (filter === 'DIP') {
+	// 	keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
+	// }
 
-	return show;
+	// if (keywordsToSearchFor && keywordsToSearchFor.length) {
+	// 	show = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
+	// }
+	// return show;
 }
 
 function evalFilterCountry(evEl, filter) {
