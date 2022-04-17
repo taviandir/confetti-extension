@@ -321,8 +321,8 @@ function initEventWindow() {
 		initOptionsInEventWindow();
 		markUnreadEvents();
 		addUnitTypeToResearchEvents();
-		enhanceAgentEvents();
 		markFilterTypeOnEvents();
+		enhanceAgentEvents();
 	});
 }
 
@@ -383,6 +383,7 @@ function enhanceAgentEvents() {
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
 		var desc = evEl.querySelector('.event-description');
+		desc.innerHTML = desc.innerHTML.replace('Agent: Suspected Spy Action. ', '');
 		// console.log("event innertext", evEl, desc, desc.innerText);
 		if (desc.innerText.indexOf('Our agent') >= 0) {
 			// console.log("ENHANCE - our agent event", desc.innerText);
