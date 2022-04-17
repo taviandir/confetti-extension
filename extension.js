@@ -406,12 +406,13 @@ function addUnitTypeToResearchEvents() {
 	setTimeout(() => {
 		// console.log('addUnitTypeToResearchEvents()');
 		var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
+		// console.log('RES event elems', eventElems);
 		for (var i = 0; i < eventElems.length; i++) {
 			var evEl = eventElems[i];
 			var desc = evEl.querySelector('.event-description');
 			var content = '';
-			if (desc.length === 1) {
-				content = desc[0].innerText;
+			if (desc) {
+				content = desc.innerText;
 			} else {
 				continue;
 			}
@@ -427,13 +428,14 @@ function addUnitTypeToResearchEvents() {
 				// find match
 				let unitTypeMatch = tryMatchUnitType(researchNameWithoutParanthesis);
 				// let unitTypeMatch = tryMatchUnitType('Benjamin Franklin Class');
+				console.log('Unit type match?', { unitTypeMatch, researchNameWithoutParanthesis, researchName });
 				if (unitTypeMatch) {
 					// set the new innerText on the content div
 					//var newContent = content.substring(0, idxStart) + researchName + ' [' + unitTypeMatch + ']' + content.substring(idxEnd);
-					setNewResearchContent(content, idxStart, idxEnd, researchName, unitTypeMatch, desc[0]);
+					setNewResearchContent(content, idxStart, idxEnd, researchName, unitTypeMatch, desc);
 				} else {
 					// perhaps a soft upgrade, try to match for it instead
-					var softUpgrades = parseSoftUnitUpgradesData();
+					// var softUpgrades = parseSoftUnitUpgradesData();
 					var lvl = extractResearchUpgradeLevel(researchName);
 					// console.log('research softs', { researchName, researchNameWithoutParanthesis, lvl });
 					if (lvl > 1) {
@@ -442,7 +444,7 @@ function addUnitTypeToResearchEvents() {
 						// if more than 3 hits, then dont write anything (too common upgrade, e.g. "Engine Upgrade (Lvl 2)"
 						if (unitTypes.length && unitTypes.length <= 3) {
 							var softMatchStr = unitTypes.join(' / ');
-							setNewResearchContent(content, idxStart, idxEnd, researchName, softMatchStr, desc[0]);
+							setNewResearchContent(content, idxStart, idxEnd, researchName, softMatchStr, desc);
 						}
 					}
 				}
