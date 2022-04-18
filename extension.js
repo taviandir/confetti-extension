@@ -302,13 +302,11 @@ function hideTutorialAdvisor() {
 }
 
 function hideGoldMarketing() {
-	var element = document.getElementById('marketingPopupContainer');
-
-	let m = document.querySelectorAll('#marketingPopupContainer .func_close_button');
-	console.log('GOLD match', m);
-	if (m.length) {
-		m.click();
-	}
+	// let m = document.querySelectorAll('#marketingPopupContainer .func_close_button');
+	// console.log('GOLD match', m);
+	// if (m.length) {
+	// 	m.click();
+	// }
 }
 
 var _unreadEventsSinceLastOpen = 0;
@@ -317,6 +315,7 @@ function initEventWindow() {
 	initUnreadCountCheck();
 	var eventButton = document.getElementById('func_btn_events');
 	eventButton.addEventListener('click', (event) => {
+		setEventWindowStyling();
 		setEventsUnreadCount();
 		initOptionsInEventWindow();
 		markUnreadEvents();
@@ -324,6 +323,21 @@ function initEventWindow() {
 		markFilterTypeOnEvents();
 		enhanceAgentEvents();
 	});
+}
+
+function setEventWindowStyling() {
+	var eventContentElem = document.querySelector('#eventsContainer .content .overview');
+	var styleElem = document.createElement('style');
+	styleElem.innerText = `li.event-box-standard[data-filter-type="CIT"] {
+		background: #275781 !important
+	}
+	li.event-box-standard[data-filter-type="DIP"] {
+		background: teal !important
+	}
+	li.event-box-standard[data-filter-type="RES"] {
+		background: lightslategray !important
+	}`;
+	eventContentElem.appendChild(styleElem);
 }
 
 function initUnreadCountCheck() {
@@ -383,7 +397,12 @@ function enhanceAgentEvents() {
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
 		var desc = evEl.querySelector('.event-description');
-		desc.innerHTML = desc.innerHTML.replace('Agent: Suspected Spy Action. ', '');
+		if (evEl.getAttribute(EventFilterTypeAttrName) !== 'AGE') continue;
+
+		if (desc.innerText.indexOf('Agent: Suspected Spy Action. ') >= 0) {
+			console.log('AGENT EVENT ----', desc);
+		}
+		// desc.innerHTML = desc.innerHTML.replace('Agent: Suspected Spy Action. ', '');
 		// console.log("event innertext", evEl, desc, desc.innerText);
 		if (desc.innerText.indexOf('Our agent') >= 0) {
 			// console.log("ENHANCE - our agent event", desc.innerText);
@@ -404,15 +423,23 @@ function enhanceAgentEvents() {
 	}
 }
 
-const EventFilterAttrName = 'data-filter-type';
+const EventFilterTypeAttrName = 'data-filter-type';
 function markFilterTypeOnEvents() {
+	// NOTE : case-sensitive!
 	let filters = {
 		COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'],
 		TER: ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'],
 		AGE: ['Agent'],
 		RES: ['Research Completed'],
 		CIT: ['built in', 'mobilized'],
-		DIP: ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'],
+		DIP: [
+			'New Article Published',
+			'Message Received',
+			'Diplomatic Status Changed',
+			'the coalition',
+			'trade offer',
+			'received a message',
+		],
 	};
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
@@ -422,7 +449,7 @@ function markFilterTypeOnEvents() {
 			let keywordsToSearchFor = filters[key];
 			let isMatch = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
 			if (isMatch) {
-				evEl.setAttribute(EventFilterAttrName, key);
+				evEl.setAttribute(EventFilterTypeAttrName, key);
 				break;
 			}
 		}
@@ -665,7 +692,7 @@ function evalFilterType(evEl, filter) {
 		return true;
 	}
 
-	var value = evEl.getAttribute(EventFilterAttrName);
+	var value = evEl.getAttribute(EventFilterTypeAttrName);
 	return value == filter;
 
 	// var show = true;
