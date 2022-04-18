@@ -1,6 +1,12 @@
 (function () {
 	'use strict';
 
+	let isMenuUrl = document.location.href.includes('game.php');
+	if (isMenuUrl && !inIframe()) {
+		initGameMenuView();
+		return;
+	}
+
 	if (!inIframe()) return;
 
 	log('INIT');
@@ -28,6 +34,43 @@
 		attributes: true, //configure it to listen to attribute changes
 	});
 })();
+
+// ********************************************************************************************************
+// ********************************************* GAME MENU VIEW *******************************************
+
+function initGameMenuView() {
+	log('GAME MENU INIT');
+	forceEnglishGameLanguage();
+}
+
+function forceEnglishGameLanguage() {
+	const sessionReloadKey = 'ext_lang_reloaded';
+	// var cookies = document.cookie;
+	// var cookiesSplit = cookies.split(';');
+	// console.log('SITE COOKIES', { cookies, cookiesSplit });
+	if (cookies.indexOf('bl_lang=0') == -1) {
+		var seshReloadValue = sessionStorage.getItem(sessionReloadKey);
+		if (seshReloadValue === '1') {
+			console.warn('already tried forcing language this session, skip (avoids infinite loop)');
+			return;
+		}
+
+		var expiryDate = new Date();
+		expiryDate.setMonth(expiryDate.getMonth() + 12);
+		const cookieName = 'bl_lang';
+		const cookieDomain = '.conflictnations.com';
+		var cookieValue = '0';
+		var finalCookieValue = cookieName + '=' + cookieValue + ';expires=' + expiryDate + ';domain=' + cookieDomain + ';path=/';
+		sessionStorage.setItem(sessionReloadKey, '1');
+		document.cookie = finalCookieValue;
+		location.href = 'https://conflictnations.com/game.php?bust=1';
+	} else {
+		log('cookie value already set, no action');
+	}
+}
+
+// ********************************************************************************************************
+// ********************************************* IN-GAME CLIENT *******************************************
 
 var __loaded = false;
 function initExtensionPlay() {
