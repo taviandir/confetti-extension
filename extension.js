@@ -45,7 +45,7 @@ function initGameMenuView() {
 
 function forceEnglishGameLanguage() {
 	const sessionReloadKey = 'ext_lang_reloaded';
-	// var cookies = document.cookie;
+	var cookies = document.cookie;
 	// var cookiesSplit = cookies.split(';');
 	// console.log('SITE COOKIES', { cookies, cookiesSplit });
 	if (cookies.indexOf('bl_lang=0') == -1) {
