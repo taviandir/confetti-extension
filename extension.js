@@ -328,15 +328,7 @@ function initEventWindow() {
 function setEventWindowStyling() {
 	var eventContentElem = document.querySelector('#eventsContainer .content .overview');
 	var styleElem = document.createElement('style');
-	styleElem.innerText = `li.event-box-standard[data-filter-type="CIT"] {
-		background: #275781 !important
-	}
-	li.event-box-standard[data-filter-type="DIP"] {
-		background: teal !important
-	}
-	li.event-box-standard[data-filter-type="RES"] {
-		background: lightslategray !important
-	}`;
+	styleElem.innerText = _eventWindowStyle;
 	eventContentElem.appendChild(styleElem);
 }
 
@@ -389,6 +381,8 @@ function markUnreadEvents() {
 	}
 }
 
+const EventAgentActorAttrName = 'data-agent-actor'; // indicates if our action or enemy's. Values: ME / ENEMY
+const EventAgentOutcomeAttrName = 'data-agent-outcome'; // indicates success or fail. Values: Y / N
 function enhanceAgentEvents() {
 	log('Enhance Agent Events');
 	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
@@ -401,7 +395,6 @@ function enhanceAgentEvents() {
 
 		// REMOVE AGENT EVENT BOILERPLATE TEXT IN THE START
 		if (desc.innerText.indexOf('Agent: Suspected Spy Action. ') >= 0) {
-			desc.parentElement = document;
 			var elStartIdx = desc.innerHTML.indexOf('<span');
 			if (elStartIdx) {
 				var textInEl = desc.firstChild;
@@ -414,24 +407,33 @@ function enhanceAgentEvents() {
 			}
 		}
 
-		// desc.innerHTML = desc.innerHTML.replace('Agent: Suspected Spy Action. ', '');
-		// console.log("event innertext", evEl, desc, desc.innerText);
-		if (desc.innerText.indexOf('Our agent') >= 0) {
-			// console.log("ENHANCE - our agent event", desc.innerText);
-			var headerEl = evEl.querySelector('.event-time');
-			if (desc.innerText.indexOf('have intercepted') >= 0) {
-				// this is one of the "done to us"
-			} else if (desc.innerText.indexOf('has been captured') >= 0) {
-				// mission failed
-				headerEl.innerText = '👎 ' + headerEl.innerText;
-				headerEl.style = 'color: yellow;';
-			} else if (desc.innerText.indexOf('sabotaged buildings') >= 0 || desc.innerText.indexOf('destroyed resources') >= 0) {
-				// mission successful
-				headerEl.innerText = '👍 ' + headerEl.innerText;
-				headerEl.style = 'color: #0f0;';
-			}
-			// TODO : agent missions done on us
+		var ourAction; // true = ours | false = enemy
+		var actionSuccess; // true = success regardless of ours or enemy | false = stopped
+		var et = desc.innerText;
+		if (et.indexOf('been captured by') >= 0) {
+			ourAction = true;
+			actionSuccess = false;
+		} else if (et.indexOf('Our agents have sabotaged') >= 0 || et.indexOf('Our agents have destroyed') >= 0) {
+			ourAction = true;
+			actionSuccess = true;
+		} else if (et.indexOf('Resources have gone missing') >= 0 || et.indexOf('Hostile agents have sabotaged') >= 0) {
+			ourAction = false;
+			actionSuccess = true;
+		} else if (et.indexOf('Our agents have intercepted') >= 0) {
+			ourAction = false;
+			actionSuccess = false;
+		} else {
+			console.warn('UNKNOWN AGENT EVENT, skip', { eventText: et });
+			continue;
 		}
+
+		evEl.setAttribute(EventAgentOutcomeAttrName, actionSuccess ? 'Y' : 'N');
+		evEl.setAttribute(EventAgentActorAttrName, ourAction ? 'ME' : 'ENEMY');
+		var headerEl = evEl.querySelector('.event-time');
+		var headerPrefix = '';
+		headerPrefix += (ourAction ? '👉' : '👈') + ' ';
+		headerPrefix += (actionSuccess ? '👍' : '👎') + ' ';
+		headerEl.innerText = headerPrefix + headerEl.innerText;
 	}
 }
 
@@ -466,24 +468,6 @@ function markFilterTypeOnEvents() {
 			}
 		}
 	}
-
-	// if (filter === 'COM') {
-	// 	keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
-	// } else if (filter === 'TER') {
-	// 	keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
-	// } else if (filter === 'AGE') {
-	// 	keywordsToSearchFor = ['Agent'];
-	// } else if (filter === 'RES') {
-	// 	keywordsToSearchFor = ['Research Completed'];
-	// } else if (filter === 'CIT') {
-	// 	keywordsToSearchFor = ['built in', 'mobilized'];
-	// } else if (filter === 'DIP') {
-	// 	keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
-	// }
-
-	// if (keywordsToSearchFor && keywordsToSearchFor.length) {
-	// 	show = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
-	// }
 }
 
 function addUnitTypeToResearchEvents() {
@@ -1028,3 +1012,31 @@ const _buildingIconSvg = `<svg version="1.1" id="Capa_1" xmlns="http://www.w3.or
 	<path d="M103,344h50c5.523,0,10-4.477,10-10v-65c0-5.523-4.477-10-10-10h-50c-5.523,0-10,4.477-10,10v65
 		C93,339.523,97.477,344,103,344z M113,279h30v45h-30V279z"/>
 </g></svg>`;
+
+const _eventWindowStyle = `
+li.event-box-standard[data-filter-type="CIT"] {
+	background: #275781 !important;
+}
+li.event-box-standard[data-filter-type="DIP"] {
+	background: teal !important;
+}
+li.event-box-standard[data-filter-type="RES"] {
+	background: lightslategray !important;
+}
+li.event-box-spyaction[data-agent-actor="ENEMY"] {
+	background: #d760bd !important;
+}
+
+li.event-box-spyaction[data-agent-actor="ME"][data-agent-outcome="Y"] .event-time {
+	color: #0f0;
+}
+li.event-box-spyaction[data-agent-actor="ME"][data-agent-outcome="N"] .event-time {
+	color: yellow;
+}
+li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="Y"] .event-time {
+	color: yellow;
+}
+li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-time {
+	color: #0f0;
+}
+`;
