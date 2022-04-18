@@ -488,7 +488,7 @@ function markFilterTypeOnEvents() {
 		TER: ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'],
 		AGE: ['Agent'],
 		RES: ['Research Completed'],
-		CIT: ['built in', 'mobilized'],
+		CIT: ['built in', 'mobilized', 'produced in'],
 		DIP: [
 			'New Article Published',
 			'Message Received',
