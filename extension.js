@@ -392,16 +392,28 @@ function markUnreadEvents() {
 function enhanceAgentEvents() {
 	log('Enhance Agent Events');
 	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
-	//console.log("children of ul", childrenOfUl, unreadEvents);
+	// console.log("children of ul", childrenOfUl, unreadEvents);
 	// console.log("AGENT childrenoful", childrenOfUl);
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
 		var desc = evEl.querySelector('.event-description');
 		if (evEl.getAttribute(EventFilterTypeAttrName) !== 'AGE') continue;
 
+		// REMOVE AGENT EVENT BOILERPLATE TEXT IN THE START
 		if (desc.innerText.indexOf('Agent: Suspected Spy Action. ') >= 0) {
-			console.log('AGENT EVENT ----', desc);
+			desc.parentElement = document;
+			var elStartIdx = desc.innerHTML.indexOf('<span');
+			if (elStartIdx) {
+				var textInEl = desc.firstChild;
+				if (textInEl.innerHTML === undefined) {
+					// NOTE : if .innerHTML === undefined, then it is a text block, so we can safely edit the text value
+					textInEl.textContent = textInEl.textContent.replace('Agent: Suspected Spy Action. ', '');
+				} else {
+					console.warn('Remove Agent Boilerplate - text is not text element');
+				}
+			}
 		}
+
 		// desc.innerHTML = desc.innerHTML.replace('Agent: Suspected Spy Action. ', '');
 		// console.log("event innertext", evEl, desc, desc.innerText);
 		if (desc.innerText.indexOf('Our agent') >= 0) {
