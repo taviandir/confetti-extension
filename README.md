@@ -11,6 +11,8 @@ This script in no ways alters data, does not intercept data sent to or from the 
 
 CONfetti enhances the UI experience in Conflict Of Nations. I created this extension to add functionality that I and others think should already exist.
 
+Note: The extension is designed for English language in the game. If you are using another client language, some functionality will not work properly.
+
 
 # Features
 
@@ -18,8 +20,8 @@ CONfetti enhances the UI experience in Conflict Of Nations. I created this exten
   - Highlight unread events
   - Filter by type
   - Filter by country
-  - "Research Completed" specifies unit type (when not ambiguous)
-  - Clearer Agent missions outcomes (partially done)
+  - "Research Completed" specifies unit type
+  - Clearer Agent missions outcomes
 - Take notes (per game, saved in the browser)
 - Window showing Units by Building Level
 - Hide tutorial advisor in the top-right
