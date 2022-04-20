@@ -364,6 +364,7 @@ function initEventWindow() {
 		markUnreadEvents();
 		addUnitTypeToResearchEvents();
 		markFilterTypeOnEvents();
+		addOtherMarkersOnEvents();
 		enhanceAgentEvents();
 	});
 }
@@ -474,13 +475,19 @@ function enhanceAgentEvents() {
 		evEl.setAttribute(EventAgentActorAttrName, ourAction ? 'ME' : 'ENEMY');
 		var headerEl = evEl.querySelector('.event-time');
 		var headerPrefix = '';
-		headerPrefix += (ourAction ? '👉' : '👈') + ' ';
-		headerPrefix += (actionSuccess ? '👍' : '👎') + ' ';
+		// headerPrefix += (ourAction ? '👉' : '👈') + ' ';
+		if (ourAction) {
+			headerPrefix += (actionSuccess ? '👍' : '👎') + ' ';
+		} else {
+			// 👮
+			headerPrefix += (actionSuccess ? '🔥' : '🛑') + ' ';
+		}
 		headerEl.innerText = headerPrefix + headerEl.innerText;
 	}
 }
 
 const EventFilterTypeAttrName = 'data-filter-type';
+const EventEventTypeAttrName = 'data-event-type';
 function markFilterTypeOnEvents() {
 	// NOTE : case-sensitive!
 	let filters = {
@@ -513,11 +520,31 @@ function markFilterTypeOnEvents() {
 	}
 }
 
+function getAllEventElements() {
+	return document.querySelectorAll('#eventsContainer .content .overview ul li');
+}
+
+function addOtherMarkersOnEvents() {
+	var eventElems = getAllEventElements();
+	for (var i = 0; i < eventElems.length; i++) {
+		var evEl = eventElems[i];
+		var desc = evEl.querySelector('.event-description');
+		var content = '';
+		if (desc) {
+			content = desc.innerText;
+		} else {
+			continue;
+		}
+
+		if (content.includes('Territory Conquered')) {
+			evEl.setAttribute(EventEventTypeAttrName, 'TERCON');
+		}
+	}
+}
+
 function addUnitTypeToResearchEvents() {
 	setTimeout(() => {
-		// console.log('addUnitTypeToResearchEvents()');
 		var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
-		// console.log('RES event elems', eventElems);
 		for (var i = 0; i < eventElems.length; i++) {
 			var evEl = eventElems[i];
 			var desc = evEl.querySelector('.event-description');
@@ -536,22 +563,20 @@ function addUnitTypeToResearchEvents() {
 				let idxEnd = content.lastIndexOf(suffix);
 				let researchName = content.substring(idxStart, idxEnd);
 				let researchNameWithoutParanthesis = researchName.substring(0, researchName.indexOf(' ('));
+
 				// find match
 				let unitTypeMatch = tryMatchUnitType(researchNameWithoutParanthesis);
-				// let unitTypeMatch = tryMatchUnitType('Benjamin Franklin Class');
-				console.log('Unit type match?', { unitTypeMatch, researchNameWithoutParanthesis, researchName });
+				// console.log('Unit type match?', { unitTypeMatch, researchNameWithoutParanthesis, researchName });
+
 				if (unitTypeMatch) {
 					// set the new innerText on the content div
-					//var newContent = content.substring(0, idxStart) + researchName + ' [' + unitTypeMatch + ']' + content.substring(idxEnd);
 					setNewResearchContent(content, idxStart, idxEnd, researchName, unitTypeMatch, desc);
 				} else {
 					// perhaps a soft upgrade, try to match for it instead
-					// var softUpgrades = parseSoftUnitUpgradesData();
 					var lvl = extractResearchUpgradeLevel(researchName);
-					// console.log('research softs', { researchName, researchNameWithoutParanthesis, lvl });
 					if (lvl > 1) {
 						var unitTypes = tryMatchSoftUpgrade(researchNameWithoutParanthesis, lvl);
-						// console.log("soft upgr result", { unitTypes });
+
 						// if more than 3 hits, then dont write anything (too common upgrade, e.g. "Engine Upgrade (Lvl 2)"
 						if (unitTypes.length && unitTypes.length <= 3) {
 							var softMatchStr = unitTypes.join(' / ');
@@ -1069,6 +1094,9 @@ li.event-box-standard[data-filter-type="RES"] {
 li.event-box-spyaction[data-agent-actor="ENEMY"] {
 	background: #d760bd !important;
 }
+li.event-box-standard[data-event-type="TERCON"] {
+	background: #577057 !important;
+}
 
 li.event-box-spyaction[data-agent-actor="ME"][data-agent-outcome="Y"] .event-time {
 	color: #0f0;
@@ -1077,9 +1105,9 @@ li.event-box-spyaction[data-agent-actor="ME"][data-agent-outcome="N"] .event-tim
 	color: yellow;
 }
 li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="Y"] .event-time {
-	color: yellow;
+	// color: #0f0;
 }
 li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-time {
-	color: #0f0;
+	// color: yellow;
 }
 `;
