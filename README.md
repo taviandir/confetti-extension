@@ -9,8 +9,7 @@ This script in no ways alters data, does not intercept data sent to or from the 
 
 # Why
 
-This extensions aims to enhance the UI experience in Conflict Of Nations.
-I made this script to fix the issues that frustrates me and to add functionality I think is lacking and should already exist.
+CONfetti enhances the UI experience in Conflict Of Nations. I created this extension to add functionality that I and others think should already exist.
 
 
 # Features
