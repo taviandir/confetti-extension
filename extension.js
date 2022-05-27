@@ -525,7 +525,7 @@ function markFilterTypeOnEvents() {
 			'Message Received',
 			'Diplomatic Status Changed',
 			'the coalition',
-			'trade offer',
+			'Trade Offer',
 			'received a message',
 		],
 	};
