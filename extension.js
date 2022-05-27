@@ -893,10 +893,18 @@ function detectCountriesInEvents() {
 }
 
 function addFreetextFilter(wrapper) {
+	var div = document.createElement('div');
+	div.id = 'confetti-event-wrapper-freetext';
+	div.style = 'display: flex; align-items: center;';
+	var labelElem = document.createElement('span');
+	labelElem.innerText = 'Text: ';
+	div.appendChild(labelElem);
 	var inputElem = document.createElement('input');
+	inputElem.style = 'align-self: stretch; flex: 1;';
 	inputElem.id = _eventFilterFreetextId;
-	wrapper.appendChild(inputElem);
+	div.appendChild(inputElem);
 	inputElem.addEventListener('keyup', onChangeFilters);
+	wrapper.appendChild(div);
 }
 
 /************************ MISC METHODS *******************************/
@@ -1154,6 +1162,10 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="Y"] .event-
 }
 li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-time {
 	// color: yellow;
+}
+
+#confetti-event-filters span {
+	margin-right: 0.25rem;
 }
 `;
 
