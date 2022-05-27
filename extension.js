@@ -1026,6 +1026,7 @@ Air	Helicopter Gunship	Attack Helicopter	Naval Strike Fighter	AWACS	Stealth Air 
 	Air Superiority Fighter	ASW Helicopter	Naval Patrol Aircraft	Naval AWACS	Stealth Strike Fighter
 	UAV	Naval Air Superiority Fighter	Heavy Bomber		Stealth Bomber
 	Rotary Wing Officer	Strike Fighter
+		Fixed Winged Officer
 
 Naval		Corvette	Destroyer	Cruiser	Aircraft Carrier
 		Frigate	Attack Submarine	Ballistic Missile Submarine
