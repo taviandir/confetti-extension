@@ -1015,9 +1015,9 @@ Cruise Missile		Booster Upgrade	Fuel Improvement		Warhead Shielding		`;
 const _unitBuildingLevelsData = `Army	Motorized Infantry	Mechanized Infantry	Special Forces	Multiple Rocket Launcher	Theater Defense System
 	National Guard	Naval Infantry	Mobile Artillery
 	Combat Recon Vehicle	Airmobile Infantry	Mobile SAM Launcher
-	Mobile Anti-Air Vehicle	Armored Fighting Vehicle	Tank Commander
-	Infantry Officer	Amphibious Combat Vehicle
-	Airborne Officer	Main Battle Tank
+	Mobile Anti-Air Vehicle	Armored Fighting Vehicle	⭐Tank Commander
+	⭐Infantry Officer	Amphibious Combat Vehicle
+	⭐Airborne Officer	Main Battle Tank
 		Tank Destroyer
 		Towed Artillery
 		Mobile Radar
@@ -1025,12 +1025,12 @@ const _unitBuildingLevelsData = `Army	Motorized Infantry	Mechanized Infantry	Spe
 Air	Helicopter Gunship	Attack Helicopter	Naval Strike Fighter	AWACS	Stealth Air Superiority Fighter
 	Air Superiority Fighter	ASW Helicopter	Naval Patrol Aircraft	Naval AWACS	Stealth Strike Fighter
 	UAV	Naval Air Superiority Fighter	Heavy Bomber		Stealth Bomber
-	Rotary Wing Officer	Strike Fighter
-		Fixed Winged Officer
+	⭐Rotary Wing Officer	Strike Fighter
+		⭐Fixed Winged Officer
 
 Naval		Corvette	Destroyer	Cruiser	Aircraft Carrier
 		Frigate	Attack Submarine	Ballistic Missile Submarine
-		Naval Officer	Submarine Commander		`;
+		⭐Naval Officer	⭐Submarine Commander		`;
 
 const _unitBuildlingPopupCss = `
 thead.ext-ub-head {
