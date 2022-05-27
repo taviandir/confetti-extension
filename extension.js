@@ -72,6 +72,7 @@ function forceEnglishGameLanguage() {
 // ********************************************************************************************************
 // ********************************************* IN-GAME CLIENT *******************************************
 
+var _activePopupWindow;
 var __loaded = false;
 function initExtensionPlay() {
 	initEventWindow();
@@ -160,8 +161,22 @@ function createPopupCloseButton() {
 }
 
 /*** UNIT BUILDING LVL MATRIX ***/
+const _ubLvlWindowName = 'UbLvl';
 function onClickMenuUnitBuildingLevel() {
 	log('UNIT BUILDING-LEVEL ITEM CLICKED');
+	if (_activePopupWindow != null) {
+		_activePopupWindow.close();
+		if (_activePopupWindow.name === _ubLvlWindowName) {
+			_activePopupWindow = null;
+			return;
+		}
+	}
+
+	_activePopupWindow = new PopupWindow(_ubLvlWindowName, initUbLvlWindow);
+	_activePopupWindow.open();
+}
+
+function initUbLvlWindow() {
 	var popupEl = document.createElement('div');
 	popupEl.id = 'ExtNotesUbLvl';
 	popupEl.style =
@@ -191,6 +206,11 @@ function onClickMenuUnitBuildingLevel() {
 	}
 
 	document.getElementById('s1914').appendChild(popupEl);
+	return popupEl;
+}
+
+function closePopupWindow() {
+	_activePopupWindow.close();
 }
 
 function initUbPopupStyles() {
@@ -223,17 +243,13 @@ function initUbLvlHeader() {
 	var headerWrapper = document.createElement('div');
 	headerWrapper.style = 'display: flex; align-items: space-between';
 	var closeButton = createPopupCloseButton();
-	closeButton.addEventListener('click', onClickCloseUbLvlWindow);
+	closeButton.addEventListener('click', closePopupWindow);
 	var headerEl = document.createElement('h1');
 	headerEl.innerText = 'Units by Building Levels';
 	headerEl.style = 'margin-bottom: 0.5rem';
 	headerWrapper.appendChild(headerEl);
 	headerWrapper.appendChild(closeButton);
 	return headerWrapper;
-}
-
-function onClickCloseUbLvlWindow() {
-	document.getElementById('ExtNotesUbLvl').remove();
 }
 
 function parseUnitBuildingLevelsData() {
@@ -269,8 +285,23 @@ function initLevelsInBuildingObj(obj) {
 }
 
 /*** NOTES ***/
+const _notesWindowName = 'Notes';
 function onClickMenuItemNotes() {
 	log('NOTES MENU ITEM CLICKED');
+	if (_activePopupWindow != null) {
+		_activePopupWindow.close();
+
+		if (_activePopupWindow.name === _notesWindowName) {
+			_activePopupWindow = null;
+			return;
+		}
+	}
+
+	_activePopupWindow = new PopupWindow(_notesWindowName, initNotesWindow);
+	_activePopupWindow.open();
+}
+
+function initNotesWindow() {
 	var popupEl = document.createElement('div');
 	popupEl.id = 'ExtNotesPopup';
 	popupEl.style =
@@ -298,7 +329,7 @@ function onClickMenuItemNotes() {
 	cancelEl.innerText = 'Cancel';
 	cancelEl.className = 'con_button large_button uppercase';
 	cancelEl.style = 'margin-right: 0.5rem;';
-	cancelEl.addEventListener('click', onClickCancelNote);
+	cancelEl.addEventListener('click', closePopupWindow);
 	buttonDiv.appendChild(cancelEl);
 
 	// save button
@@ -310,10 +341,7 @@ function onClickMenuItemNotes() {
 	buttonDiv.appendChild(saveEl);
 
 	document.getElementById('s1914').appendChild(popupEl);
-}
-
-function onClickCancelNote() {
-	closeNoteWindow();
+	return popupEl;
 }
 
 function onClickSaveNote() {
@@ -322,11 +350,7 @@ function onClickSaveNote() {
 	log(textValue);
 	saveGameNote(getGameId(), textValue);
 	// log('NOTE SAVED');
-	closeNoteWindow();
-}
-
-function closeNoteWindow() {
-	document.getElementById('ExtNotesPopup').remove();
+	closePopupWindow();
 }
 
 function loadGameNote(gameId) {
@@ -1111,3 +1135,23 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 	// color: yellow;
 }
 `;
+
+// *************** CLASSES ***************
+
+class PopupWindow {
+	/**
+	 * @param {string} name name/identifier of the popup window.
+	 * @param {Function} openFunc The code that opens the popup window. Must return the root HTML element for the window.
+	 */
+	constructor(name, openFunc) {
+		this.name = name;
+		this.openFunc = openFunc;
+	}
+
+	open() {
+		this.windowElement = this.openFunc();
+	}
+	close() {
+		this.windowElement.remove();
+	}
+}
