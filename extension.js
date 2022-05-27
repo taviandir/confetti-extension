@@ -435,6 +435,7 @@ function initOptionsInEventWindow() {
 
 		addTypeFilterSelect(wrapper);
 		addCountryFilterSelect(wrapper);
+		addFreetextFilter(wrapper);
 	}
 }
 
@@ -712,6 +713,7 @@ function onChangeFilters() {
 	console.log('onChangeFilters()');
 	var typeFilterValue = getEventFilterTypeValue();
 	var countryFilterValue = getEventFilterCountryValue();
+	var freetextValue = getEventFilterFreetextValue();
 	// console.log("FILTER VALUES", { typeFilterValue, countryFilterValue });
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
@@ -721,9 +723,10 @@ function onChangeFilters() {
 		var evEl = eventElems[i];
 		var typeOk = evalFilterType(evEl, typeFilterValue);
 		var countryOk = evalFilterCountry(evEl, countryFilterValue);
-		// console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, typeFilterValue, countryFilterValue });
+		var freetextOk = evalFilterFreetext(evEl, freetextValue);
+		// console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, freetextOk, typeFilterValue, countryFilterValue });
 
-		var show = typeOk && countryOk;
+		var show = typeOk && countryOk && freetextOk;
 		if (show) {
 			evEl.removeAttribute('hidden');
 		} else {
@@ -769,6 +772,11 @@ function getEventFilterCountryValue() {
 	return document.getElementById('' + _eventFilterCountryId).value;
 }
 
+var _eventFilterFreetextId = 'confetti-filter-freetext-input';
+function getEventFilterFreetextValue() {
+	return document.getElementById('' + _eventFilterFreetextId).value;
+}
+
 function evalFilterType(evEl, filter) {
 	if (!filter || filter == '' || filter == 'ALL') return true;
 	var desc = evEl.querySelector('.event-description');
@@ -809,6 +817,11 @@ function evalFilterCountry(evEl, filter) {
 	if (!filter || filter == '') return true;
 	var attr = evEl.getAttribute('data-country');
 	return attr === filter;
+}
+
+function evalFilterFreetext(evEl, filter) {
+	if (!filter || filter == '') return true;
+	return evEl.textContent.toLowerCase().includes(filter.toLowerCase());
 }
 
 function addCountryFilterSelect(elem) {
@@ -877,6 +890,13 @@ function detectCountriesInEvents() {
 	console.log('>>>>>> countries result', { result });
 	result.sort((a, b) => (a.value < b.value ? -1 : 1));
 	return result;
+}
+
+function addFreetextFilter(wrapper) {
+	var inputElem = document.createElement('input');
+	inputElem.id = _eventFilterFreetextId;
+	wrapper.appendChild(inputElem);
+	inputElem.addEventListener('keyup', onChangeFilters);
 }
 
 /************************ MISC METHODS *******************************/
