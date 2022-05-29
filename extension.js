@@ -401,13 +401,13 @@ function setEventWindowStyling() {
 }
 
 function initUnreadCountCheck() {
-	log('init unread count checker');
+	// log('init unread count checker');
 	var eventsBtnElem = document.getElementById('func_btn_events');
-	console.log('unread events elem', eventsBtnElem);
+	// console.log('unread events elem', eventsBtnElem);
 	if (eventsBtnElem) {
 		eventsBtnElem.onmouseenter = function () {
 			var unreadEventsElem = document.getElementById('func_events_unread');
-			log('UNREAD EVENTS: ' + unreadEventsElem.innerText);
+			// log('UNREAD EVENTS: ' + unreadEventsElem.innerText);
 			if (unreadEventsElem.innerText !== '') {
 				var unreadValue = parseInt(unreadEventsElem.innerText);
 				if (+unreadValue) {
@@ -436,17 +436,42 @@ function initOptionsInEventWindow() {
 		addTypeFilterSelect(wrapper);
 		addCountryFilterSelect(wrapper);
 		addFreetextFilter(wrapper);
+
+		// let secondRowWrapper = document.createElement('div');
+		// secondRowWrapper.id = 'confetti-event-row2';
+		var titleDiv = document.querySelector('#eventsContainer .dialog_title');
+		titleDiv.style = 'display: flex; align-items: center;';
+		addClearUnreadButton(titleDiv);
+		// wrapper.after(secondRowWrapper);
+	}
+}
+
+function addClearUnreadButton(wrapper) {
+	let btn = document.createElement('button');
+	btn.innerText = 'Clear Unread';
+	btn.classList.add('con_button');
+	btn.style = 'position: absolute; right: 5rem;';
+	wrapper.appendChild(btn);
+	btn.addEventListener('click', onClickButtonClearUnread);
+}
+
+function onClickButtonClearUnread() {
+	_unreadEvents = 0;
+	_unreadEventsSinceLastOpen = 0;
+	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
+	for (var i = 0; i < childrenOfUl.length; i++) {
+		var liElem = childrenOfUl[i];
+		liElem.classList.remove('confetti-event-unread');
 	}
 }
 
 function markUnreadEvents() {
 	console.log('Mark Unread Events', _unreadEvents);
 	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
-	//console.log("children of ul", childrenOfUl, unreadEvents);
 	for (var i = 0; i < _unreadEvents; i++) {
 		var liElem = childrenOfUl[i];
-		// console.log("SET UNREAD: li elem", liElem);
-		liElem.style.borderLeft = '4px solid yellow';
+		// liElem.style.borderLeft = '4px solid yellow';
+		liElem.classList.add('confetti-event-unread');
 	}
 }
 
@@ -1167,6 +1192,11 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 #confetti-event-filters span {
 	margin-right: 0.25rem;
 }
+
+#eventsContainer .content .overview ul li.confetti-event-unread {
+	border-left: 4px solid yellow
+}
+
 `;
 
 // *************** CLASSES ***************
