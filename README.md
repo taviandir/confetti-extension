@@ -1,6 +1,6 @@
 # CONfetti - Make CON great again!
 
-This is the source code for the browser extension CONfetti.
+This is the source code for the browser extension CONfetti. Install in your Chrome or Chromium-based browser here: https://chrome.google.com/webstore/detail/confetti/meibidpiiljmhnhfpcbhjoiemkopmkpb?hl=en
 
 ## Disclaimer
 
