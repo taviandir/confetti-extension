@@ -20,6 +20,7 @@ Note: The extension is designed for English language in the game. If you are usi
   - Highlight unread events
   - Filter by type
   - Filter by country
+  - Freetext search
   - "Research Completed" specifies unit type
   - Clearer Agent missions outcomes
 - Take notes (per game, saved in the browser)
@@ -36,13 +37,11 @@ Note: The extension is designed for English language in the game. If you are usi
 # Upcoming features / Wishlist / Ideas
 
 -   Events:
-    -   Agent missions clarification (in progress)
-    -   Freetext search
     -   More detailed combat filters (ground / naval / air / missiles, wins / losses)
     -   Combat clarification (directions, e.g. I attacked X, or X attacked me - if possible)
 -   Show city morale details right away (if possible)
 -   Advanced Combat Report window
 -   Units By B-Level - officers, seasonal as optional includes
 -   Game Selector View: Force English language (so the extension works properly)
-
+-   [Requested] Prevent scroll reset when queueing units or buildings
 
