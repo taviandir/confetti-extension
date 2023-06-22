@@ -2,6 +2,7 @@
 	"name": "confetti-extensions",
 	"version": "1.0.0",
 	"author": "Jimmy Svejderud <email@example.com>",
+	"type": "module",
 	"scripts": {
 		"start": "tsc --watch"
 	}

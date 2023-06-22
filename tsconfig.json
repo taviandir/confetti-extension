@@ -1,13 +1,15 @@
 {
 	"compilerOptions": {
-		"module": "system",
+		"module": "None",
+		"outDir": "dist/commonjs/",
 		"noImplicitAny": false,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"outFile": "dist/extension.js",
+		// "outFile": "dist/extension.js",
 		"sourceMap": false,
 		"target": "ES2015",
 		"moduleResolution": "Node"
+		// "lib": ["dom", "es2015", "es5", "es6"]
 	},
 	"include": ["src/**/*"],
 	"exclude": ["**/*.spec.ts"],

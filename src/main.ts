@@ -258,7 +258,7 @@ function initUbLvlHeader() {
 }
 
 function parseUnitBuildingLevelsData() {
-	var rows = _unitBuildingLevelsData.split('\n');
+	var rows = ResearchData.UnitBuildingLevelsData.split('\n');
 	let dict = {};
 	let currentObj = null;
 	for (let row of rows) {
@@ -564,7 +564,7 @@ function markFilterTypeOnEvents() {
 		],
 	};
 
-	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
+	var eventElems = document.querySelectorAll<HTMLElement>('#eventsContainer .content .overview ul li');
 	for (let evEl of eventElems) {
 		var content = evEl.querySelector<HTMLElement>('.event-description').innerText;
 		for (let key in filters) {
@@ -710,7 +710,7 @@ function parseUnitDoctrineData() {
 	if (_parsedUnitDoctrineData) {
 		return _parsedUnitDoctrineData;
 	}
-	let rowSplit = _unitDoctrineData.split('\n');
+	let rowSplit = ResearchData.UnitDoctrineData.split('\n');
 	var result = {};
 	for (let i = 0; i < rowSplit.length; i++) {
 		let rawRow = rowSplit[i];
@@ -728,7 +728,7 @@ function parseSoftUnitUpgradesData() {
 	if (_parsedSoftUpgradesData) {
 		return _parsedSoftUpgradesData;
 	}
-	let rowSplit = _unitSoftUpgradesData.split('\n');
+	let rowSplit = ResearchData.UnitSoftUpgradesData.split('\n');
 	var result = {};
 	for (let i = 0; i < rowSplit.length; i++) {
 		let rawRow = rowSplit[i];
@@ -744,7 +744,7 @@ function parseSoftUnitUpgradesData() {
 
 /****************************** EVENT FILTERS ******************************/
 function onChangeFilters() {
-	console.log('onChangeFilters()');
+	log('onChangeFilters()');
 	var typeFilterValue = getEventFilterTypeValue();
 	var countryFilterValue = getEventFilterCountryValue();
 	var freetextValue = getEventFilterFreetextValue();
@@ -785,34 +785,30 @@ function addTypeFilterSelect(elem) {
 	filterSelect.id = _eventFilterTypeId;
 	wrapper.appendChild(filterSelect);
 	filterSelect.style.padding = '0.5rem';
-	addOptionToParent('All', 'ALL', filterSelect);
-	addOptionToParent('Combat', 'COM', filterSelect);
-	addOptionToParent('Territories', 'TER', filterSelect);
-	addOptionToParent('Agents', 'AGE', filterSelect);
-	addOptionToParent('Research', 'RES', filterSelect);
-	addOptionToParent('City Production', 'CIT', filterSelect);
-	addOptionToParent('Diplomacy', 'DIP', filterSelect);
+	DomHelpers.addOptionToSelect('All', 'ALL', filterSelect);
+	DomHelpers.addOptionToSelect('Combat', 'COM', filterSelect);
+	DomHelpers.addOptionToSelect('Territories', 'TER', filterSelect);
+	DomHelpers.addOptionToSelect('Agents', 'AGE', filterSelect);
+	DomHelpers.addOptionToSelect('Research', 'RES', filterSelect);
+	DomHelpers.addOptionToSelect('City Production', 'CIT', filterSelect);
+	DomHelpers.addOptionToSelect('Diplomacy', 'DIP', filterSelect);
 	filterSelect.addEventListener('change', onChangeFilters);
 	elem.append(wrapper);
 }
 
 var _eventFilterTypeId = 'confetti-filter-type-select';
 function getEventFilterTypeValue() {
-	return getInputElement('' + _eventFilterTypeId).value;
+	return DomHelpers.getInputElementById('' + _eventFilterTypeId).value;
 }
 
 var _eventFilterCountryId = 'confetti-filter-country-select';
 function getEventFilterCountryValue() {
-	return getInputElement('' + _eventFilterCountryId).value;
+	return DomHelpers.getInputElementById('' + _eventFilterCountryId).value;
 }
 
 var _eventFilterFreetextId = 'confetti-filter-freetext-input';
 function getEventFilterFreetextValue() {
-	return getInputElement('' + _eventFilterFreetextId).value;
-}
-
-function getInputElement(idSelector: string): HTMLInputElement {
-	return document.getElementById(idSelector) as HTMLInputElement;
+	return DomHelpers.getInputElementById('' + _eventFilterFreetextId).value;
 }
 
 function evalFilterType(evEl, filter) {
@@ -883,10 +879,10 @@ function addCountryFilterSelect(elem) {
 	filterSelect.style.padding = '0.5rem';
 
 	// add options
-	addOptionToParent('All', '', filterSelect);
+	DomHelpers.addOptionToSelect('All', '', filterSelect);
 	for (var i = 0; i < countries.length; i++) {
 		var c = countries[i];
-		addOptionToParent(c.value, c.key, filterSelect);
+		DomHelpers.addOptionToSelect(c.value, c.key, filterSelect);
 	}
 
 	filterSelect.addEventListener('change', onChangeFilters);
@@ -956,12 +952,12 @@ function insertAfter(newNode, referenceNode) {
 	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-function addOptionToParent(displayName, value, parentElem) {
-	let node = document.createElement('option');
-	node.value = value;
-	node.innerText = displayName;
-	parentElem.appendChild(node);
-}
+// function addOptionToParent(displayName: string, value: any, parentElem: HTMLElement) {
+// 	let node = document.createElement('option');
+// 	node.value = value;
+// 	node.innerText = displayName;
+// 	parentElem.appendChild(node);
+// }
 
 function log(msg) {
 	if (typeof msg === 'string') {
@@ -989,114 +985,6 @@ const _flagCountryNameDict = {
 	thechosen: 'The Chosen',
 	roguestate: 'Rogue State',
 };
-
-const _unitDoctrineData = `Motorized Infantry									Basic Infantry	Advanced Infantry	Modern Infantry
-Mechanized Infantry									Basic Mechanized	Advanced Mechanized	Modern Mechanized
-Naval Infantry									Basic Marines	Advanced Marines	Modern Marines
-Airborne Infantry									Basic Airborne	Advanced Airborne	Modern Airborne
-Special Forces	Basic Rangers	Advanced Rangers	Modern Rangers		Basic SAS	Advanced SAS	Modern SAS		Basic Spetsnaz	Advanced Spetsnaz	Modern Spetsnaz
-National Guard									Basic National Guard	Advanced National Guard	Modern National Guard
-Combat Recon Vehicle	M113 Recon	M1117 RSTA	LAV-25		Fox FV721	VEC-M1	Griffon VBMR		BRDM-1	BRDM-2	BRDM-3
-Armored Fighting Vehicle	M551 Sheridan	M2 Bradley	M3 Bradley		Scorpion	FV Warrior	Puma		BMP-2	BMP-3 Dragon	T-15
-Amphibious Combat Vehicle	LVTP-7	AAVP-7A1	ACV 1.1		Fuchs	Piranha	VCBI II		BTR-80	BTR-90	Bumerang
-Main Battle Tank	M1A1 Abrams	M1A2 Abrams	M1A3 Abrams		Leopard 2	Challenger 2	Leopard 2A7+		T-80	T-90	T-14 Armata
-Tank Destroyer	M56 Scorpion	M901 ITV	M1134 Stryker ATGM		Kanonenjagdpanzer	AMX-10 RC	Centauro		2S25 Sprut-SD	BMPT Terminator	BMPT-72 Terminator 2
-Towed Artillery	M198 Howitzer	M119 Howitzer	M777 Howitzer		FH70	TRF1	155 GH 52 APU		D-30 Howitzer	2A36 Giatsint-B	2A Msta-B
-Mobile Artillery	M110 Howitzer	M109 Howitzer	M1203 NLOS		GCT 155mm	AS-90 Braveheart	Panzerhaubitzer 2000		2S3 Akatsiya	2S19 Msta-S	2S35 Koalitsiya-SV
-Multiple Rocket Launcher	M270 MLRS	M270A1 MLRS	M142 HIMARS		Teruel	M270 B1	LRSVM Morava		BM-21 Grad	BM-30 Smerch	9A52-4 Tornado
-Mobile Anti-Air Vehicle	M163 VADS	M247 Sergeant York	LAV-AD Air Defense		Gepard	Otomatic	Marksman		AZU-57-2	ZSU-23-4 Shilka	2K22 Tunguska
-Mobile SAM Launcher	MIM-23 Hawk	MIM-72 Chaparral	AN/TWQ-1 Avenger		Ozelot	Crotale	Stormer HVM		9K35 Strela-10	BUK M1	Pantsir-S1
-Theater Defense System	MIM-14 Nike	MIM-104 Patriot	THAAD Missile Defence		Bloodhound	MEADS	SAMP/T		S-125 Neva	S-300	S-400 Triumf
-Mobile Radar	LCM RADAR	ELEC EQ-36	PATRIOT AN/MPQ-53		UNIMOG SCB	MARS-L	Ground Master 400		1L121-E	KASTA	Nebo-M
-Helicopter Gunship	Kiowa	UH-1Y Venom	Armed Black Hawk		Gazelle	Super Puma	NH-90		Mi-8 TVK	Mi-24 Hind	Mi-35M
-Attack Helicopter	AH-1G Cobra	AH-1Z Viper	AH-64D Apache Longbow		A129 Mangusta	AW Apache AH64D	Tiger		Ka-50 Black Shark	Ka-52 Alligator	Mi-28 Havoc
-ASW Helicopter	SH-3 Sea King	SH-2 Super Seasprite	MH-60R Seahawk		AB 212ASW	Panther	AW159 Wildcat		Ka-25	Mi-14 Haze	Ka-27 Helix
-Air Superiority Fighter	F-5 Tiger	F-16A Fighting Falcon	F-16V Viper		J 35A Draken	Mirage F1	Typhoon		MiG-23 Flogger	MiG-29 Fulcrum	MiG-35 Super Fulcrum
-Naval Air Superiority Fighter	F-4 Phantom II	F-14A Tomcat	F-14D Super Tomcat		Étendard IVM	Jaguar M	Rafale M		Yak-141	Su-33 Flanker D	MiG-29K
-Stealth Air Superiority Fighter	F-22 Raptor				MBB Firefly				Su-47 Berkut
-Strike Fighter	F-111 Aardvark	F-15 Strike Eagle	F-15 Silent Eagle		Mirage Delta 2000	Tornado	JAS 39 Gripen		Su-24 Fencer	Su-27 Flanker	Su-35 Super Flanker
-Naval Strike Fighter	A-6 Intruder	A-7 Corsair II	F-18 Super Hornet		Harrier	Super Étendard	Harrier II Plus		Yak-38	Su-27K	Su-35K
-Stealth Strike Fighter	F-35 Lightning II				F-117 Nighthawk				Su-T50 PakFa
-UAV	MQ1-Predator	RQ-9 Global Hawk	X-47B		Super Heron	MQ9-Reaper	NEUROn		ZOND II	United 40 B5	MIG SKAT
-Naval Patrol Aircraft	P-3 Orion	CP-140 Aurora	P-8 Poseidon		Nimrod	CN-235 CASA	C295 Persuader		Tu-142 Bear	Il-38 Dolphin	A-40 Albatros
-AWACS	EC-121 Warning Star	E-3 Sentry	E-8 Joint STARS		EC-121 Warning Star	E-3 Sentry	E-8 Joint STARS		Tu-126	A-50 Mainstay	A-100
-Naval AWACS	E-2 Hawkeye				Bombardier Globaleye				Tu-126XXXXX
-Heavy Bomber	B-47 Stratojet	B-52 Stratofortress	B-1 Lancer		Valiant	Victor	Vulcan		Tu-95 Bear	Tu-22M Backfire	Tu-160 White Swan
-Stealth Bomber	B-2 Spirit				SR71 Blackbird				Tu-PakDa
-Corvette	Hamilton Class	Cyclone Class	Freedom Class LCS		Descubierta Class	Göteborg Class	Braunschweig Class		Albatros Class	Steregushchiy Class	Gremyashchiy Class
-Frigate	Garcia Class	Knox Class	Perry Class		Duke Class	Bremen Class	Horizon Class		Krivak Class	Neutrashimy Class	Admiral Gorshkov Class
-Destroyer	Farragut Class	Spruance Class	Arleigh Burke Class		Hamburg Class	Gloucester Class	Daring Class		Kashin Class	Sovremennyy Class	Lider Class
-Cruiser	California Class	Virginia Class	Ticonderoga Class		Tiger Class	Vittorio Veneto Class	Absalon Class		Kresta II Class	Kara Class	Slava Class
-Aircraft Carrier	Kitty Hawk Class	Nimitz Class	Gerald R. Ford Class		Giuseppe Garibaldi Class	Charles de Gaulle Class	Queen Elizabeth Class		Kiev Class	Kuznetsov Class	Ulyanovsk Class
-Attack Submarine	Los Angeles Class	Seawolf Class	Virginia Class		Swiftsure Class	Rubis Class	Astute Class		Viktor Class	Akula Class	Yasen Class
-Ballistic Missile Submarine	Benjamin Franklin Class	Ohio Class	Columbia Class		Resolution Class	Vanguard Class	Triomphant Class		Delta Class	Typhoon Class	Borey Class
-ICBM	Minuteman III	GBSD			M51.1	M51.2			RT-2PM Topol	RS-26 Rubezh
-Ballistic Missile	Pershing I	Pershing II	Pershing III		PGM-17 Thor	SSBS S3	J-600T		Scud	SS-20 Saber	9K720 Iskander
-Cruise Missile	Gryphon	Tomahawk	LRSO		RBS-15	KEPD 350	Storm Shadow		P-500 Bazalt	Kh-55	3M-54 Klub`;
-
-const _unitSoftUpgradesData = `Motorized Infantry		Engine Upgrade I	Man Portable Air Defense		Engine Upgrade II		Personal Armor
-Mechanized Infantry		Engine Upgrade		NBC Protection	Reinforced Armor
-Naval Infantry		Engine Upgrade	Portable Air Defense		NBC Protection
-Airborne Infantry		Jungle Warfare Training	Rapid Deployment Training		Woodland Warfare Training	Advanced Ballistic Armor
-Special Forces		Portable Air Defense		Amphibious Warfare Training
-National Guard		Personal Armor	Rapid Deployment Training I		Rapid Deployment Training II		Streamlined Mobilization
-Combat Recon Vehicle		Engine Upgrade	Air Assault		NBC Protection		Reinforced Armor
-Armored Fighting Vehicle		Ground-to-Air Armament Upgrade	Reinforced Armor		NBC Protection		Urban Survival Kit
-Amphibious Combat Vehicle
-Main Battle Tank		Reinforced Armor	Engine Upgrade		NBC Protection		Urban Survival Kit
-Tank Destroyer		Anti Personnel Ammunition	Engine Upgrade		Air Assault		Reinforced Armor
-Towed Artillery		Rocket Assisted Projectiles		Air Assault	Enhanced Optical Sights		Extended Barrel Upgrade
-Mobile Artillery		Rocket Assisted Projectiles	Reinforced Armor		NBC Protection
-Multiple Rocket Launcher		Improved Rocket Range	Engine Upgrade
-Mobile Anti-Air Vehicle		Reinforced Armor	Engine Upgrade		Air Assault		Ground-to-Air Armament Upgrade
-Mobile SAM Launcher		Improved Missile Range	Engine Upgrade		Air Assault
-Theater Defense System		Improved Missile Range	Survivability Kit		Stealth Locating System
-Mobile Radar		Advanced Sensors Array	Engine Upgrade		Stealth Locating System
-Helicopter Gunship		Bulletproofing	Engine Upgrade		AT Missile Pods		Fuel Optimization Measures
-Attack Helicopter		Bulletproofing		Fuel Optimization Measures	Engine Upgrade		Streamlined Mobilization
-ASW Helicopter		Fuel Optimization Measures	Advanced Sensors Array		Anti-Surface Warfare Kit
-Air Superiority Fighter		Reinforced Airframe	Engine Replacement		Fuel Optimization Measures		Streamlined Mobilization
-Naval Air Superiority Fighter
-Stealth Air Superiority Fighter
-Strike Fighter		Reinforced Airframe	Air-to-Air Armament Upgrade		Fuel Optimization Measures		Streamlined Mobilization
-Naval Strike Fighter
-Stealth Strike Fighter
-UAV		Fuel Optimization Measures		Engine Replacement	Reinforced Airframe
-Naval Patrol Aircraft		Advanced Sensor Array		Cruise Missile Hardpoints
-AWACS		Reinforced Airframe	Advanced Sensor Array		Stealth Locating System
-Naval AWACS
-Heavy Bomber		Reinforced Airframe	Fuel Optimization Measures		Increased Missile Hardpoints		Bunker Busting Ordnance
-Stealth Bomber
-Corvette		Survivability Refit	Streamlined Mobilization		Engine Overhaul		Air Defense Upgrade
-Frigate		AA Envelope Expansion	Point-Defense Upgrade		Engine Overhaul	Stealth Locating System
-Destroyer		Engine Overhaul	Air Defense Upgrade		Survivability Refit
-Cruiser		Survivability Refit		Expanded Missile Magazine
-Aircraft Carrier		Air Defense Upgrade		Point-Defense Upgrade
-Attack Submarine		Survivability Refit	Nuclear Reactor Refit		Expanded Missile Magazine
-Ballistic Missile Submarine		Nuclear Reactor Refit	Cruise Missile Launch System		Improved Reloading System	Expanded Missile Magazine
-ICBM		Fuel Improvement	Warhead Shielding
-Ballistic Missile		Fuel Improvement	Booster Upgrade		Warhead Shielding
-Cruise Missile		Booster Upgrade	Fuel Improvement		Warhead Shielding		`;
-
-const _unitBuildingLevelsData = `Army	Motorized Infantry	Mechanized Infantry	Special Forces	Multiple Rocket Launcher	Theater Defense System
-	National Guard	Naval Infantry	Mobile Artillery
-	Combat Recon Vehicle	Airmobile Infantry	Mobile SAM Launcher
-	Mobile Anti-Air Vehicle	Armored Fighting Vehicle	⭐Tank Commander
-	⭐Infantry Officer	Amphibious Combat Vehicle
-	⭐Airborne Officer	Main Battle Tank
-		Tank Destroyer
-		Towed Artillery
-		Mobile Radar
-
-Air	Helicopter Gunship	Attack Helicopter	Naval Strike Fighter	AWACS	Stealth Air Superiority Fighter
-	Air Superiority Fighter	ASW Helicopter	Naval Patrol Aircraft	Naval AWACS	Stealth Strike Fighter
-	UAV	Naval Air Superiority Fighter	Heavy Bomber		Stealth Bomber
-	⭐Rotary Wing Officer	Strike Fighter
-		⭐Fixed Winged Officer
-
-Naval		Corvette	Destroyer	Cruiser	Aircraft Carrier
-		Frigate	Attack Submarine	Ballistic Missile Submarine
-		⭐Naval Officer	⭐Submarine Commander		`;
 
 const _unitBuildlingPopupCss = `
 thead.ext-ub-head {
@@ -1234,4 +1122,131 @@ class PopupWindow {
 	close() {
 		this.windowElement.remove();
 	}
+}
+
+class DomHelpers {
+	public static getInputElementById(idSelector: string) {
+		return document.getElementById(idSelector) as HTMLInputElement;
+	}
+
+	public static addOptionToSelect(displayName: string, value: any, parentElem: HTMLSelectElement) {
+		let node = document.createElement('option');
+		node.value = value;
+		node.innerText = displayName;
+		parentElem.appendChild(node);
+	}
+}
+
+const DomIds = {
+	// TODO copy all the global string id variables from src/main.ts that starts with _ and paste them here
+};
+
+class ResearchData {
+	public static UnitSoftUpgradesData = `Motorized Infantry		Engine Upgrade I	Man Portable Air Defense		Engine Upgrade II		Personal Armor
+Mechanized Infantry		Engine Upgrade		NBC Protection	Reinforced Armor
+Naval Infantry		Engine Upgrade	Portable Air Defense		NBC Protection
+Airborne Infantry		Jungle Warfare Training	Rapid Deployment Training		Woodland Warfare Training	Advanced Ballistic Armor
+Special Forces		Portable Air Defense		Amphibious Warfare Training
+National Guard		Personal Armor	Rapid Deployment Training I		Rapid Deployment Training II		Streamlined Mobilization
+Combat Recon Vehicle		Engine Upgrade	Air Assault		NBC Protection		Reinforced Armor
+Armored Fighting Vehicle		Ground-to-Air Armament Upgrade	Reinforced Armor		NBC Protection		Urban Survival Kit
+Amphibious Combat Vehicle
+Main Battle Tank		Reinforced Armor	Engine Upgrade		NBC Protection		Urban Survival Kit
+Tank Destroyer		Anti Personnel Ammunition	Engine Upgrade		Air Assault		Reinforced Armor
+Towed Artillery		Rocket Assisted Projectiles		Air Assault	Enhanced Optical Sights		Extended Barrel Upgrade
+Mobile Artillery		Rocket Assisted Projectiles	Reinforced Armor		NBC Protection
+Multiple Rocket Launcher		Improved Rocket Range	Engine Upgrade
+Mobile Anti-Air Vehicle		Reinforced Armor	Engine Upgrade		Air Assault		Ground-to-Air Armament Upgrade
+Mobile SAM Launcher		Improved Missile Range	Engine Upgrade		Air Assault
+Theater Defense System		Improved Missile Range	Survivability Kit		Stealth Locating System
+Mobile Radar		Advanced Sensors Array	Engine Upgrade		Stealth Locating System
+Helicopter Gunship		Bulletproofing	Engine Upgrade		AT Missile Pods		Fuel Optimization Measures
+Attack Helicopter		Bulletproofing		Fuel Optimization Measures	Engine Upgrade		Streamlined Mobilization
+ASW Helicopter		Fuel Optimization Measures	Advanced Sensors Array		Anti-Surface Warfare Kit
+Air Superiority Fighter		Reinforced Airframe	Engine Replacement		Fuel Optimization Measures		Streamlined Mobilization
+Naval Air Superiority Fighter
+Stealth Air Superiority Fighter
+Strike Fighter		Reinforced Airframe	Air-to-Air Armament Upgrade		Fuel Optimization Measures		Streamlined Mobilization
+Naval Strike Fighter
+Stealth Strike Fighter
+UAV		Fuel Optimization Measures		Engine Replacement	Reinforced Airframe
+Naval Patrol Aircraft		Advanced Sensor Array		Cruise Missile Hardpoints
+AWACS		Reinforced Airframe	Advanced Sensor Array		Stealth Locating System
+Naval AWACS
+Heavy Bomber		Reinforced Airframe	Fuel Optimization Measures		Increased Missile Hardpoints		Bunker Busting Ordnance
+Stealth Bomber
+Corvette		Survivability Refit	Streamlined Mobilization		Engine Overhaul		Air Defense Upgrade
+Frigate		AA Envelope Expansion	Point-Defense Upgrade		Engine Overhaul	Stealth Locating System
+Destroyer		Engine Overhaul	Air Defense Upgrade		Survivability Refit
+Cruiser		Survivability Refit		Expanded Missile Magazine
+Aircraft Carrier		Air Defense Upgrade		Point-Defense Upgrade
+Attack Submarine		Survivability Refit	Nuclear Reactor Refit		Expanded Missile Magazine
+Ballistic Missile Submarine		Nuclear Reactor Refit	Cruise Missile Launch System		Improved Reloading System	Expanded Missile Magazine
+ICBM		Fuel Improvement	Warhead Shielding
+Ballistic Missile		Fuel Improvement	Booster Upgrade		Warhead Shielding
+Cruise Missile		Booster Upgrade	Fuel Improvement		Warhead Shielding		`;
+
+	public static UnitDoctrineData = `Motorized Infantry									Basic Infantry	Advanced Infantry	Modern Infantry
+Mechanized Infantry									Basic Mechanized	Advanced Mechanized	Modern Mechanized
+Naval Infantry									Basic Marines	Advanced Marines	Modern Marines
+Airborne Infantry									Basic Airborne	Advanced Airborne	Modern Airborne
+Special Forces	Basic Rangers	Advanced Rangers	Modern Rangers		Basic SAS	Advanced SAS	Modern SAS		Basic Spetsnaz	Advanced Spetsnaz	Modern Spetsnaz
+National Guard									Basic National Guard	Advanced National Guard	Modern National Guard
+Combat Recon Vehicle	M113 Recon	M1117 RSTA	LAV-25		Fox FV721	VEC-M1	Griffon VBMR		BRDM-1	BRDM-2	BRDM-3
+Armored Fighting Vehicle	M551 Sheridan	M2 Bradley	M3 Bradley		Scorpion	FV Warrior	Puma		BMP-2	BMP-3 Dragon	T-15
+Amphibious Combat Vehicle	LVTP-7	AAVP-7A1	ACV 1.1		Fuchs	Piranha	VCBI II		BTR-80	BTR-90	Bumerang
+Main Battle Tank	M1A1 Abrams	M1A2 Abrams	M1A3 Abrams		Leopard 2	Challenger 2	Leopard 2A7+		T-80	T-90	T-14 Armata
+Tank Destroyer	M56 Scorpion	M901 ITV	M1134 Stryker ATGM		Kanonenjagdpanzer	AMX-10 RC	Centauro		2S25 Sprut-SD	BMPT Terminator	BMPT-72 Terminator 2
+Towed Artillery	M198 Howitzer	M119 Howitzer	M777 Howitzer		FH70	TRF1	155 GH 52 APU		D-30 Howitzer	2A36 Giatsint-B	2A Msta-B
+Mobile Artillery	M110 Howitzer	M109 Howitzer	M1203 NLOS		GCT 155mm	AS-90 Braveheart	Panzerhaubitzer 2000		2S3 Akatsiya	2S19 Msta-S	2S35 Koalitsiya-SV
+Multiple Rocket Launcher	M270 MLRS	M270A1 MLRS	M142 HIMARS		Teruel	M270 B1	LRSVM Morava		BM-21 Grad	BM-30 Smerch	9A52-4 Tornado
+Mobile Anti-Air Vehicle	M163 VADS	M247 Sergeant York	LAV-AD Air Defense		Gepard	Otomatic	Marksman		AZU-57-2	ZSU-23-4 Shilka	2K22 Tunguska
+Mobile SAM Launcher	MIM-23 Hawk	MIM-72 Chaparral	AN/TWQ-1 Avenger		Ozelot	Crotale	Stormer HVM		9K35 Strela-10	BUK M1	Pantsir-S1
+Theater Defense System	MIM-14 Nike	MIM-104 Patriot	THAAD Missile Defence		Bloodhound	MEADS	SAMP/T		S-125 Neva	S-300	S-400 Triumf
+Mobile Radar	LCM RADAR	ELEC EQ-36	PATRIOT AN/MPQ-53		UNIMOG SCB	MARS-L	Ground Master 400		1L121-E	KASTA	Nebo-M
+Helicopter Gunship	Kiowa	UH-1Y Venom	Armed Black Hawk		Gazelle	Super Puma	NH-90		Mi-8 TVK	Mi-24 Hind	Mi-35M
+Attack Helicopter	AH-1G Cobra	AH-1Z Viper	AH-64D Apache Longbow		A129 Mangusta	AW Apache AH64D	Tiger		Ka-50 Black Shark	Ka-52 Alligator	Mi-28 Havoc
+ASW Helicopter	SH-3 Sea King	SH-2 Super Seasprite	MH-60R Seahawk		AB 212ASW	Panther	AW159 Wildcat		Ka-25	Mi-14 Haze	Ka-27 Helix
+Air Superiority Fighter	F-5 Tiger	F-16A Fighting Falcon	F-16V Viper		J 35A Draken	Mirage F1	Typhoon		MiG-23 Flogger	MiG-29 Fulcrum	MiG-35 Super Fulcrum
+Naval Air Superiority Fighter	F-4 Phantom II	F-14A Tomcat	F-14D Super Tomcat		Étendard IVM	Jaguar M	Rafale M		Yak-141	Su-33 Flanker D	MiG-29K
+Stealth Air Superiority Fighter	F-22 Raptor				MBB Firefly				Su-47 Berkut
+Strike Fighter	F-111 Aardvark	F-15 Strike Eagle	F-15 Silent Eagle		Mirage Delta 2000	Tornado	JAS 39 Gripen		Su-24 Fencer	Su-27 Flanker	Su-35 Super Flanker
+Naval Strike Fighter	A-6 Intruder	A-7 Corsair II	F-18 Super Hornet		Harrier	Super Étendard	Harrier II Plus		Yak-38	Su-27K	Su-35K
+Stealth Strike Fighter	F-35 Lightning II				F-117 Nighthawk				Su-T50 PakFa
+UAV	MQ1-Predator	RQ-9 Global Hawk	X-47B		Super Heron	MQ9-Reaper	NEUROn		ZOND II	United 40 B5	MIG SKAT
+Naval Patrol Aircraft	P-3 Orion	CP-140 Aurora	P-8 Poseidon		Nimrod	CN-235 CASA	C295 Persuader		Tu-142 Bear	Il-38 Dolphin	A-40 Albatros
+AWACS	EC-121 Warning Star	E-3 Sentry	E-8 Joint STARS		EC-121 Warning Star	E-3 Sentry	E-8 Joint STARS		Tu-126	A-50 Mainstay	A-100
+Naval AWACS	E-2 Hawkeye				Bombardier Globaleye				Tu-126XXXXX
+Heavy Bomber	B-47 Stratojet	B-52 Stratofortress	B-1 Lancer		Valiant	Victor	Vulcan		Tu-95 Bear	Tu-22M Backfire	Tu-160 White Swan
+Stealth Bomber	B-2 Spirit				SR71 Blackbird				Tu-PakDa
+Corvette	Hamilton Class	Cyclone Class	Freedom Class LCS		Descubierta Class	Göteborg Class	Braunschweig Class		Albatros Class	Steregushchiy Class	Gremyashchiy Class
+Frigate	Garcia Class	Knox Class	Perry Class		Duke Class	Bremen Class	Horizon Class		Krivak Class	Neutrashimy Class	Admiral Gorshkov Class
+Destroyer	Farragut Class	Spruance Class	Arleigh Burke Class		Hamburg Class	Gloucester Class	Daring Class		Kashin Class	Sovremennyy Class	Lider Class
+Cruiser	California Class	Virginia Class	Ticonderoga Class		Tiger Class	Vittorio Veneto Class	Absalon Class		Kresta II Class	Kara Class	Slava Class
+Aircraft Carrier	Kitty Hawk Class	Nimitz Class	Gerald R. Ford Class		Giuseppe Garibaldi Class	Charles de Gaulle Class	Queen Elizabeth Class		Kiev Class	Kuznetsov Class	Ulyanovsk Class
+Attack Submarine	Los Angeles Class	Seawolf Class	Virginia Class		Swiftsure Class	Rubis Class	Astute Class		Viktor Class	Akula Class	Yasen Class
+Ballistic Missile Submarine	Benjamin Franklin Class	Ohio Class	Columbia Class		Resolution Class	Vanguard Class	Triomphant Class		Delta Class	Typhoon Class	Borey Class
+ICBM	Minuteman III	GBSD			M51.1	M51.2			RT-2PM Topol	RS-26 Rubezh
+Ballistic Missile	Pershing I	Pershing II	Pershing III		PGM-17 Thor	SSBS S3	J-600T		Scud	SS-20 Saber	9K720 Iskander
+Cruise Missile	Gryphon	Tomahawk	LRSO		RBS-15	KEPD 350	Storm Shadow		P-500 Bazalt	Kh-55	3M-54 Klub`;
+
+	public static UnitBuildingLevelsData = `Army	Motorized Infantry	Mechanized Infantry	Special Forces	Multiple Rocket Launcher	Theater Defense System
+	National Guard	Naval Infantry	Mobile Artillery
+	Combat Recon Vehicle	Airmobile Infantry	Mobile SAM Launcher
+	Mobile Anti-Air Vehicle	Armored Fighting Vehicle	⭐Tank Commander
+	⭐Infantry Officer	Amphibious Combat Vehicle
+	⭐Airborne Officer	Main Battle Tank
+		Tank Destroyer
+		Towed Artillery
+		Mobile Radar
+
+Air	Helicopter Gunship	Attack Helicopter	Naval Strike Fighter	AWACS	Stealth Air Superiority Fighter
+	Air Superiority Fighter	ASW Helicopter	Naval Patrol Aircraft	Naval AWACS	Stealth Strike Fighter
+	UAV	Naval Air Superiority Fighter	Heavy Bomber		Stealth Bomber
+	⭐Rotary Wing Officer	Strike Fighter
+		⭐Fixed Winged Officer
+
+Naval		Corvette	Destroyer	Cruiser	Aircraft Carrier
+		Frigate	Attack Submarine	Ballistic Missile Submarine
+		⭐Naval Officer	⭐Submarine Commander		`;
 }
