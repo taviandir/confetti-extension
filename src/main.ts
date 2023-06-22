@@ -121,10 +121,13 @@ function initExtensionMenuRow() {
 	var refElement = document.getElementById('menuContainer');
 	var menuWrapper = document.createElement('div');
 	menuWrapper.id = 'ExtMenu';
-	menuWrapper.style = 'position: absolute; bottom: -80px; left: 0; width: 315px; z-index: 10; color: white; margin-left: 13px;';
+	menuWrapper.setAttribute(
+		'style',
+		'position: absolute; bottom: -80px; left: 0; width: 315px; z-index: 10; color: white; margin-left: 13px;'
+	);
 	var ulEl = document.createElement('ul');
 	ulEl.classList.add('mainmenu');
-	ulEl.style = 'display: grid; grid-template-columns: repeat(5, 1fr)';
+	ulEl.setAttribute('style', 'display: grid; grid-template-columns: repeat(5, 1fr)');
 	menuWrapper.appendChild(ulEl);
 	insertAfter(menuWrapper, refElement);
 
@@ -133,7 +136,7 @@ function initExtensionMenuRow() {
 	ubLvlButtonEl.style.fill = 'white';
 	var svgWrapper = document.createElement('div');
 	svgWrapper.innerHTML = _buildingIconSvg;
-	svgWrapper.style = 'width: 100%; margin: 0.25rem';
+	svgWrapper.setAttribute('style', 'width: 100%; margin: 0.25rem');
 	ubLvlButtonEl.appendChild(svgWrapper);
 	ubLvlButtonEl.addEventListener('click', onClickMenuUnitBuildingLevel);
 
@@ -146,7 +149,7 @@ function initExtensionMenuRow() {
 function addButtonToMenu(menuEl) {
 	var liEl = document.createElement('li');
 	liEl.classList.add('con_button');
-	liEl.style = 'display: inline-flex; align-items: center; justify-content: center; font-weight: bold;';
+	liEl.setAttribute('style', 'display: inline-flex; align-items: center; justify-content: center; font-weight: bold;');
 	menuEl.appendChild(liEl);
 	return liEl;
 }
@@ -154,7 +157,7 @@ function addButtonToMenu(menuEl) {
 function createPopupCloseButton() {
 	var div = document.createElement('div');
 	div.innerHTML = `<div class="close_button_s"><div>x</div></div>`;
-	var child = div.firstChild;
+	var child = <any>div.firstChild;
 	child.parent = null;
 	div.remove();
 	return child;
@@ -179,8 +182,10 @@ function onClickMenuUnitBuildingLevel() {
 function initUbLvlWindow() {
 	var popupEl = document.createElement('div');
 	popupEl.id = 'ExtNotesUbLvl';
-	popupEl.style =
-		'min-width: 500px; background: #51666d; color: white; border: 1px solid #ccc; position: absolute; left: 2%; top: 25%; display: flex; flex-direction: column; padding: 0.25rem;';
+	popupEl.setAttribute(
+		'style',
+		'min-width: 500px; background: #51666d; color: white; border: 1px solid #ccc; position: absolute; left: 2%; top: 25%; display: flex; flex-direction: column; padding: 0.25rem;'
+	);
 	popupEl.appendChild(initUbPopupStyles());
 	popupEl.appendChild(initUbLvlHeader());
 	var tableWrapper = document.createElement('div');
@@ -189,7 +194,7 @@ function initUbLvlWindow() {
 
 	// inject data into table
 	var data = parseUnitBuildingLevelsData();
-	var tableEl = tableWrapper.firstChild;
+	var tableEl = tableWrapper.firstChild as HTMLElement;
 	for (let key in data) {
 		let obj = data[key];
 		for (let lvl = 1; lvl <= 5; lvl++) {
@@ -197,7 +202,7 @@ function initUbLvlWindow() {
 			if (arr.length) {
 				let tdHtml = ubArrayToHtml(arr);
 				var cellId = getUbTableCellId(key, lvl);
-				var tdMatch = tableEl.querySelectorAll('#' + cellId);
+				var tdMatch = tableEl.querySelectorAll<HTMLElement>('#' + cellId);
 				if (tdMatch.length) {
 					tdMatch[0].innerHTML = tdHtml;
 				}
@@ -241,12 +246,12 @@ function getUbTableCellId(building, lvl) {
 
 function initUbLvlHeader() {
 	var headerWrapper = document.createElement('div');
-	headerWrapper.style = 'display: flex; align-items: space-between';
+	headerWrapper.setAttribute('style', 'display: flex; align-items: space-between');
 	var closeButton = createPopupCloseButton();
 	closeButton.addEventListener('click', closePopupWindow);
 	var headerEl = document.createElement('h1');
 	headerEl.innerText = 'Units by Building Levels';
-	headerEl.style = 'margin-bottom: 0.5rem';
+	headerEl.setAttribute('style', 'margin-bottom: 0.5rem');
 	headerWrapper.appendChild(headerEl);
 	headerWrapper.appendChild(closeButton);
 	return headerWrapper;
@@ -304,23 +309,25 @@ function onClickMenuItemNotes() {
 function initNotesWindow() {
 	var popupEl = document.createElement('div');
 	popupEl.id = 'ExtNotesPopup';
-	popupEl.style =
-		'min-width: 500px; background: #eee; color: black; border: 1px solid #ccc; position: absolute; left: 2%; top: 25%; display: flex; flex-direction: column; padding: 0.25rem;';
+	popupEl.setAttribute(
+		'style',
+		'min-width: 500px; background: #eee; color: black; border: 1px solid #ccc; position: absolute; left: 2%; top: 25%; display: flex; flex-direction: column; padding: 0.25rem;'
+	);
 	var headerEl = document.createElement('h1');
 	headerEl.innerText = 'Notes';
-	headerEl.style = 'margin-bottom: 0.5rem';
+	headerEl.setAttribute('style', 'margin-bottom: 0.5rem');
 	popupEl.appendChild(headerEl);
 
 	var gameId = getGameId();
 	var textEl = document.createElement('textarea');
 	textEl.id = 'ExtNoteInput';
 	textEl.value = loadGameNote(gameId);
-	textEl.setAttribute('rows', 10);
+	textEl.setAttribute('rows', '10');
 	popupEl.appendChild(textEl);
 
 	// buttons container
 	var buttonDiv = document.createElement('div');
-	buttonDiv.style = 'display: flex; margin-top: 0.5rem; justify-content: flex-end';
+	buttonDiv.setAttribute('style', 'display: flex; margin-top: 0.5rem; justify-content: flex-end');
 	popupEl.appendChild(buttonDiv);
 
 	// cancel button
@@ -328,7 +335,7 @@ function initNotesWindow() {
 	cancelEl.id = 'ExtNoteCancel';
 	cancelEl.innerText = 'Cancel';
 	cancelEl.className = 'con_button large_button uppercase';
-	cancelEl.style = 'margin-right: 0.5rem;';
+	cancelEl.setAttribute('style', 'margin-right: 0.5rem;');
 	cancelEl.addEventListener('click', closePopupWindow);
 	buttonDiv.appendChild(cancelEl);
 
@@ -346,7 +353,8 @@ function initNotesWindow() {
 
 function onClickSaveNote() {
 	// log('save click');
-	var textValue = document.getElementById('ExtNoteInput').value;
+	var inputElement: HTMLInputElement = <HTMLInputElement>document.getElementById('ExtNoteInput');
+	var textValue = inputElement.value;
 	log(textValue);
 	saveGameNote(getGameId(), textValue);
 	// log('NOTE SAVED');
@@ -430,7 +438,7 @@ function initOptionsInEventWindow() {
 		// create a parent wrapper object for all filters
 		let wrapper = document.createElement('div');
 		wrapper.id = 'confetti-event-filters';
-		wrapper.style = 'display: flex; padding: 1rem;';
+		wrapper.setAttribute('style', 'display: flex; padding: 1rem;');
 		eventContentElem.prepend(wrapper);
 
 		addTypeFilterSelect(wrapper);
@@ -440,7 +448,7 @@ function initOptionsInEventWindow() {
 		// let secondRowWrapper = document.createElement('div');
 		// secondRowWrapper.id = 'confetti-event-row2';
 		var titleDiv = document.querySelector('#eventsContainer .dialog_title');
-		titleDiv.style = 'display: flex; align-items: center;';
+		titleDiv.setAttribute('style', 'display: flex; align-items: center;');
 		addClearUnreadButton(titleDiv);
 		// wrapper.after(secondRowWrapper);
 	}
@@ -450,7 +458,7 @@ function addClearUnreadButton(wrapper) {
 	let btn = document.createElement('button');
 	btn.innerText = 'Clear Unread';
 	btn.classList.add('con_button');
-	btn.style = 'position: absolute; right: 5rem;';
+	btn.setAttribute('style', 'position: absolute; right: 5rem;');
 	wrapper.appendChild(btn);
 	btn.addEventListener('click', onClickButtonClearUnread);
 }
@@ -484,14 +492,14 @@ function enhanceAgentEvents() {
 	// console.log("AGENT childrenoful", childrenOfUl);
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
-		var desc = evEl.querySelector('.event-description');
+		var desc = evEl.querySelector<HTMLElement>('.event-description');
 		if (evEl.getAttribute(EventFilterTypeAttrName) !== 'AGE') continue;
 
 		// REMOVE AGENT EVENT BOILERPLATE TEXT IN THE START
 		if (desc.innerText.indexOf('Agent: Suspected Spy Action. ') >= 0) {
 			var elStartIdx = desc.innerHTML.indexOf('<span');
 			if (elStartIdx) {
-				var textInEl = desc.firstChild;
+				var textInEl = desc.firstChild as HTMLElement;
 				if (textInEl.innerHTML === undefined) {
 					// NOTE : if .innerHTML === undefined, then it is a text block, so we can safely edit the text value
 					textInEl.textContent = textInEl.textContent.replace('Agent: Suspected Spy Action. ', '');
@@ -523,7 +531,7 @@ function enhanceAgentEvents() {
 
 		evEl.setAttribute(EventAgentOutcomeAttrName, actionSuccess ? 'Y' : 'N');
 		evEl.setAttribute(EventAgentActorAttrName, ourAction ? 'ME' : 'ENEMY');
-		var headerEl = evEl.querySelector('.event-time');
+		var headerEl = evEl.querySelector<HTMLElement>('.event-time');
 		var headerPrefix = '';
 		// headerPrefix += (ourAction ? '👉' : '👈') + ' ';
 		if (ourAction) {
@@ -558,7 +566,7 @@ function markFilterTypeOnEvents() {
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
 	for (let evEl of eventElems) {
-		var content = evEl.querySelector('.event-description').innerText;
+		var content = evEl.querySelector<HTMLElement>('.event-description').innerText;
 		for (let key in filters) {
 			let keywordsToSearchFor = filters[key];
 			let isMatch = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
@@ -578,7 +586,7 @@ function addOtherMarkersOnEvents() {
 	var eventElems = getAllEventElements();
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
-		var desc = evEl.querySelector('.event-description');
+		var desc = evEl.querySelector<HTMLElement>('.event-description');
 		var content = '';
 		if (desc) {
 			content = desc.innerText;
@@ -597,7 +605,7 @@ function addUnitTypeToResearchEvents() {
 		var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
 		for (var i = 0; i < eventElems.length; i++) {
 			var evEl = eventElems[i];
-			var desc = evEl.querySelector('.event-description');
+			var desc = evEl.querySelector<HTMLElement>('.event-description');
 			var content = '';
 			if (desc) {
 				content = desc.innerText;
@@ -656,8 +664,9 @@ function setNewResearchContent(content, idxStart, idxEnd, researchName, matchNam
 
 function extractResearchUpgradeLevel(researchName) {
 	var x = /(\d\))$/.exec(researchName)[0].replace(')', '');
-	if (!isNaN(x)) {
-		return parseInt(x);
+	var num = parseInt(x);
+	if (!isNaN(num)) {
+		return num;
 	} else {
 		return null;
 	}
@@ -789,17 +798,21 @@ function addTypeFilterSelect(elem) {
 
 var _eventFilterTypeId = 'confetti-filter-type-select';
 function getEventFilterTypeValue() {
-	return document.getElementById('' + _eventFilterTypeId).value;
+	return getInputElement('' + _eventFilterTypeId).value;
 }
 
 var _eventFilterCountryId = 'confetti-filter-country-select';
 function getEventFilterCountryValue() {
-	return document.getElementById('' + _eventFilterCountryId).value;
+	return getInputElement('' + _eventFilterCountryId).value;
 }
 
 var _eventFilterFreetextId = 'confetti-filter-freetext-input';
 function getEventFilterFreetextValue() {
-	return document.getElementById('' + _eventFilterFreetextId).value;
+	return getInputElement('' + _eventFilterFreetextId).value;
+}
+
+function getInputElement(idSelector: string): HTMLInputElement {
+	return document.getElementById(idSelector) as HTMLInputElement;
 }
 
 function evalFilterType(evEl, filter) {
@@ -920,12 +933,12 @@ function detectCountriesInEvents() {
 function addFreetextFilter(wrapper) {
 	var div = document.createElement('div');
 	div.id = 'confetti-event-wrapper-freetext';
-	div.style = 'display: flex; align-items: center;';
+	div.setAttribute('style', 'display: flex; align-items: center;');
 	var labelElem = document.createElement('span');
 	labelElem.innerText = 'Text: ';
 	div.appendChild(labelElem);
 	var inputElem = document.createElement('input');
-	inputElem.style = 'align-self: stretch; flex: 1;';
+	inputElem.setAttribute('style', 'align-self: stretch; flex: 1;');
 	inputElem.id = _eventFilterFreetextId;
 	div.appendChild(inputElem);
 	inputElem.addEventListener('keyup', onChangeFilters);
@@ -1202,9 +1215,13 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 // *************** CLASSES ***************
 
 class PopupWindow {
+	name: string;
+	openFunc: Function;
+	windowElement: HTMLElement;
+
 	/**
-	 * @param {string} name name/identifier of the popup window.
-	 * @param {Function} openFunc The code that opens the popup window. Must return the root HTML element for the window.
+	 * @param name name/identifier of the popup window.
+	 * @param openFunc The code that opens the popup window. Must return the root HTML element for the window.
 	 */
 	constructor(name, openFunc) {
 		this.name = name;
