@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"module": "None",
-		"outDir": "dist/commonjs/",
+		"outDir": "dist/",
 		"noImplicitAny": false,
 		"removeComments": true,
 		"preserveConstEnums": true,
