@@ -12,7 +12,6 @@
 	log('INIT');
 
 	let correctUrl = document.location.href.includes('con-client');
-	console.log('CORRECT URL?', { correctUrl, href: document.location.href });
 
 	if (!correctUrl) return;
 
@@ -46,8 +45,6 @@ function initGameMenuView() {
 function forceEnglishGameLanguage() {
 	const sessionReloadKey = 'ext_lang_reloaded';
 	var cookies = document.cookie;
-	// var cookiesSplit = cookies.split(';');
-	// console.log('SITE COOKIES', { cookies, cookiesSplit });
 	if (cookies.indexOf('bl_lang=0') == -1) {
 		var seshReloadValue = sessionStorage.getItem(sessionReloadKey);
 		if (seshReloadValue === '1') {
@@ -126,7 +123,7 @@ function initExtensionMenuRow() {
 		'position: absolute; bottom: -80px; left: 0; width: 315px; z-index: 10; color: white; margin-left: 13px;'
 	);
 	var ulEl = document.createElement('ul');
-	ulEl.classList.add('mainmenu');
+	CD.addClassToElement(ulEl, 'mainmenu');
 	ulEl.setAttribute('style', 'display: grid; grid-template-columns: repeat(5, 1fr)');
 	menuWrapper.appendChild(ulEl);
 	insertAfter(menuWrapper, refElement);
@@ -378,7 +375,6 @@ function hideTutorialAdvisor() {
 
 function hideGoldMarketing() {
 	// let m = document.querySelectorAll('#marketingPopupContainer .func_close_button');
-	// console.log('GOLD match', m);
 	// if (m.length) {
 	// 	m.click();
 	// }
@@ -411,11 +407,9 @@ function setEventWindowStyling() {
 function initUnreadCountCheck() {
 	// log('init unread count checker');
 	var eventsBtnElem = document.getElementById('func_btn_events');
-	// console.log('unread events elem', eventsBtnElem);
 	if (eventsBtnElem) {
 		eventsBtnElem.onmouseenter = function () {
 			var unreadEventsElem = document.getElementById('func_events_unread');
-			// log('UNREAD EVENTS: ' + unreadEventsElem.innerText);
 			if (unreadEventsElem.innerText !== '') {
 				var unreadValue = parseInt(unreadEventsElem.innerText);
 				if (+unreadValue) {
@@ -432,7 +426,6 @@ function setEventsUnreadCount() {
 }
 
 function initOptionsInEventWindow() {
-	// log('init event window!');
 	var eventContentElem = document.querySelector('#eventsContainer .content .overview');
 	if (eventContentElem) {
 		// create a parent wrapper object for all filters
@@ -445,19 +438,16 @@ function initOptionsInEventWindow() {
 		addCountryFilterSelect(wrapper);
 		addFreetextFilter(wrapper);
 
-		// let secondRowWrapper = document.createElement('div');
-		// secondRowWrapper.id = 'confetti-event-row2';
 		var titleDiv = document.querySelector('#eventsContainer .dialog_title');
 		titleDiv.setAttribute('style', 'display: flex; align-items: center;');
 		addClearUnreadButton(titleDiv);
-		// wrapper.after(secondRowWrapper);
 	}
 }
 
 function addClearUnreadButton(wrapper) {
 	let btn = document.createElement('button');
 	btn.innerText = 'Clear Unread';
-	btn.classList.add('con_button');
+	CD.addClassToElement(btn, 'con_button');
 	btn.setAttribute('style', 'position: absolute; right: 5rem;');
 	wrapper.appendChild(btn);
 	btn.addEventListener('click', onClickButtonClearUnread);
@@ -474,11 +464,9 @@ function onClickButtonClearUnread() {
 }
 
 function markUnreadEvents() {
-	console.log('Mark Unread Events', _unreadEvents);
 	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
 	for (var i = 0; i < _unreadEvents; i++) {
 		var liElem = childrenOfUl[i];
-		// liElem.style.borderLeft = '4px solid yellow';
 		liElem.classList.add('confetti-event-unread');
 	}
 }
@@ -488,8 +476,6 @@ const EventAgentOutcomeAttrName = 'data-agent-outcome'; // indicates success or 
 function enhanceAgentEvents() {
 	log('Enhance Agent Events');
 	let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
-	// console.log("children of ul", childrenOfUl, unreadEvents);
-	// console.log("AGENT childrenoful", childrenOfUl);
 	for (var i = 0; i < childrenOfUl.length; i++) {
 		var evEl = childrenOfUl[i];
 		var desc = evEl.querySelector<HTMLElement>('.event-description');
@@ -533,7 +519,6 @@ function enhanceAgentEvents() {
 		evEl.setAttribute(EventAgentActorAttrName, ourAction ? 'ME' : 'ENEMY');
 		var headerEl = evEl.querySelector<HTMLElement>('.event-time');
 		var headerPrefix = '';
-		// headerPrefix += (ourAction ? '👉' : '👈') + ' ';
 		if (ourAction) {
 			headerPrefix += (actionSuccess ? '👍' : '👎') + ' ';
 		} else {
@@ -549,15 +534,16 @@ const EventEventTypeAttrName = 'data-event-type';
 function markFilterTypeOnEvents() {
 	// NOTE : case-sensitive!
 	let filters = {
-		COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'],
+		COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties', 'Firing', 'Taking damage'],
 		TER: ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'],
-		AGE: ['Agent'],
+		AGE: ['Agent', 'agent', 'agents'],
 		RES: ['Research Completed'],
 		CIT: ['built in', 'mobilized', 'produced in'],
 		DIP: [
 			'New Article Published',
 			'Message Received',
 			'Diplomatic Status Changed',
+			'declared war',
 			'the coalition',
 			'Trade Offer',
 			'received a message',
@@ -579,7 +565,7 @@ function markFilterTypeOnEvents() {
 }
 
 function getAllEventElements() {
-	return document.querySelectorAll('#eventsContainer .content .overview ul li');
+	return CD.qa('#eventsContainer .content .overview ul li');
 }
 
 function addOtherMarkersOnEvents() {
@@ -624,7 +610,6 @@ function addUnitTypeToResearchEvents() {
 
 				// find match
 				let unitTypeMatch = tryMatchUnitType(researchNameWithoutParanthesis);
-				// console.log('Unit type match?', { unitTypeMatch, researchNameWithoutParanthesis, researchName });
 
 				if (unitTypeMatch) {
 					// set the new innerText on the content div
@@ -658,7 +643,6 @@ function setNewResearchContent(content, idxStart, idxEnd, researchName, matchNam
 		matchName +
 		' ]</span>' +
 		content.substring(idxEnd);
-	// console.log("NEW RESEARCH CONTENT", newContent);
 	el.innerHTML = newContent;
 }
 
@@ -694,7 +678,6 @@ function tryMatchUnitType(researchName) {
 	for (let key in data) {
 		if (data.hasOwnProperty(key)) {
 			if (data[key].some((str) => str == researchName)) {
-				// console.log("MATCH FOUND!", { type: key, needle: researchName });
 				return key;
 			}
 		}
@@ -748,17 +731,14 @@ function onChangeFilters() {
 	var typeFilterValue = getEventFilterTypeValue();
 	var countryFilterValue = getEventFilterCountryValue();
 	var freetextValue = getEventFilterFreetextValue();
-	// console.log("FILTER VALUES", { typeFilterValue, countryFilterValue });
 
 	var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
-	// console.log('eventElems', { eventElems });
 
 	for (var i = 0; i < eventElems.length; i++) {
 		var evEl = eventElems[i];
 		var typeOk = evalFilterType(evEl, typeFilterValue);
 		var countryOk = evalFilterCountry(evEl, countryFilterValue);
 		var freetextOk = evalFilterFreetext(evEl, freetextValue);
-		// console.log('EV FILTER RESULT', { evEl, typeOk, countryOk, freetextOk, typeFilterValue, countryFilterValue });
 
 		var show = typeOk && countryOk && freetextOk;
 		if (show) {
@@ -815,7 +795,6 @@ function evalFilterType(evEl, filter) {
 	if (!filter || filter == '' || filter == 'ALL') return true;
 	var desc = evEl.querySelector('.event-description');
 	var content = '';
-	// console.log('evalFilterType', { desc, filter });
 	if (desc) {
 		content = desc.innerText;
 	} else {
@@ -824,27 +803,6 @@ function evalFilterType(evEl, filter) {
 
 	var value = evEl.getAttribute(EventFilterTypeAttrName);
 	return value == filter;
-
-	// var show = true;
-	// var keywordsToSearchFor;
-	// if (filter === 'COM') {
-	// 	keywordsToSearchFor = ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'];
-	// } else if (filter === 'TER') {
-	// 	keywordsToSearchFor = ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'];
-	// } else if (filter === 'AGE') {
-	// 	keywordsToSearchFor = ['Agent'];
-	// } else if (filter === 'RES') {
-	// 	keywordsToSearchFor = ['Research Completed'];
-	// } else if (filter === 'CIT') {
-	// 	keywordsToSearchFor = ['built in', 'mobilized'];
-	// } else if (filter === 'DIP') {
-	// 	keywordsToSearchFor = ['New Article Published', 'Message Received', 'Diplomatic Status Changed', 'the coalition', 'trade offer'];
-	// }
-
-	// if (keywordsToSearchFor && keywordsToSearchFor.length) {
-	// 	show = keywordsToSearchFor.map((x) => content.includes(x)).some((match) => match === true);
-	// }
-	// return show;
 }
 
 function evalFilterCountry(evEl, filter) {
@@ -861,7 +819,6 @@ function evalFilterFreetext(evEl, filter) {
 function addCountryFilterSelect(elem) {
 	log('addCountryFilterSelect()');
 	var countries = detectCountriesInEvents();
-	// console.log("COUNTRIES", countries);
 
 	let wrapper = document.createElement('div');
 	wrapper.id = 'confetti-event-wrapper-country';
@@ -921,7 +878,6 @@ function detectCountriesInEvents() {
 	});
 
 	// finally, sort
-	console.log('>>>>>> countries result', { result });
 	result.sort((a, b) => (a.value < b.value ? -1 : 1));
 	return result;
 }
@@ -1140,6 +1096,31 @@ class DomHelpers {
 const DomIds = {
 	// TODO copy all the global string id variables from src/main.ts that starts with _ and paste them here
 };
+
+class CD {
+	static getInputElementById(idSelector: string) {
+		return document.getElementById(idSelector) as HTMLInputElement;
+	}
+
+	static addOptionToSelect(displayName: string, value: any, parentElem: HTMLSelectElement) {
+		let node = document.createElement('option');
+		node.value = value;
+		node.innerText = displayName;
+		parentElem.appendChild(node);
+	}
+
+	static q(selector: string) {
+		return document.querySelector<HTMLElement>(selector);
+	}
+
+	static qa(selector: string) {
+		return document.querySelectorAll<HTMLElement>(selector);
+	}
+
+	static addClassToElement(el: HTMLElement, className: string) {
+		el.classList.add(className);
+	}
+}
 
 class ResearchData {
 	public static UnitSoftUpgradesData = `Motorized Infantry		Engine Upgrade I	Man Portable Air Defense		Engine Upgrade II		Personal Armor
