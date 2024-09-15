@@ -77,6 +77,7 @@ function initExtensionPlay() {
 	hideTutorialAdvisor();
 	initExtensionMenuRow();
 	initDiplomacyWindow();
+	NewsFeature.init();
 }
 
 function initDiplomacyWindow() {
@@ -726,6 +727,116 @@ function parseSoftUnitUpgradesData() {
 }
 
 /****************************** EVENT FILTERS ******************************/
+class NewsFeature {
+	private static _dataKeyTemplate = 'confetti_news_econ_stats_day_{0}';
+
+	public static init() {
+		log('NewsFeature.init');
+		CD.q('#func_btn_newspaper').addEventListener('click', NewsFeature.onOpenNewsWindow);
+	}
+
+	private static onOpenNewsWindow() {
+		log('NewsFeature.onOpenNewsWindow');
+		var newsStatsEl = CD.q('#newspaper_statistics');
+		console.log('CONFETTI - newsStatsEl', newsStatsEl);
+		if (newsStatsEl) {
+			NewsFeature.checkNewsStatsText(newsStatsEl);
+		}
+		var newsPoupEl = CD.q('.func_dialog_content');
+		if (newsPoupEl) {
+			console.log('CONFETTI - newsPoupEl', newsPoupEl);
+			NewsFeature.createChangeObserver(newsPoupEl);
+		}
+	}
+
+	private static checkNewsStatsText(el: HTMLElement) {
+		const innerText = el.innerText;
+		if (innerText.indexOf('Largest Economies') >= 0) {
+			log('parse economics');
+			NewsFeature.parseNewsStats(innerText);
+		} else {
+			log('not economics');
+		}
+	}
+
+	private static parseNewsStats(innerText: string) {
+		// TODO : this needs to take into consideration that we've injected
+		//        the diff data into the innerText?
+		var dataRaw = innerText.split('in units:')[1];
+		dataRaw = dataRaw.replaceAll(' tons.', '');
+		var dataRows = dataRaw.split('\n');
+		const day = NewsFeature.getNewsDay();
+
+		// already parsed?
+		const existingData = Confetti.getData<NewsEconomyStatsData>(NewsFeature.getKeyForDay(day));
+		if (existingData != null) {
+			log('Parsed econ data for day already exists');
+			return existingData;
+		}
+
+		const result = <NewsEconomyStatsData>{ day, rows: [] };
+		for (let row of dataRows) {
+			let parts = row.split(':');
+			if (parts.length < 3) continue;
+			var place = parts[0].trim().replace(/\D/g, '');
+			var nation = parts[1].trim();
+			var value = parts[2].trim().replace(',', '');
+			// console.log('CONFETTI - row parsed', { place, nation, value });
+			result.rows.push(<NewsEconomyStatsRow>{ place: +place, nation, value: +value });
+		}
+
+		// save
+		log('saving news econ data for Day ' + day.toString());
+		log(result);
+		Confetti.saveData(NewsFeature.getKeyForDay(day), result);
+		return result;
+	}
+
+	private static createChangeObserver(targetNode: HTMLElement) {
+		const config = { attributes: false, childList: true };
+		const callback = function (mutationsList, observer) {
+			for (const mutation of mutationsList) {
+				if (mutation.type === 'childList') {
+					log('A child node has been added or removed.');
+					var newsStatsEl = CD.q('#newspaper_statistics');
+					// NOTE : this triggers twice on changes
+					if (newsStatsEl) {
+						NewsFeature.checkNewsStatsText(newsStatsEl);
+					}
+				}
+			}
+		};
+		const observer = new MutationObserver(callback);
+		observer.observe(targetNode, config);
+		log('setup News change observer');
+	}
+
+	private static getNewsDay(): number {
+		var el = CD.q('#func_newspaper_day_tf') as HTMLInputElement;
+		const value = +el.value;
+		if (value === 0) {
+			throw new Error('Could not parse day from news window');
+		}
+		return value;
+	}
+
+	private static getKeyForDay(day: number) {
+		return NewsFeature._dataKeyTemplate.replace('{0}', day.toString());
+	}
+}
+
+interface NewsEconomyStatsData {
+	day: number;
+	rows: NewsEconomyStatsRow[];
+}
+
+interface NewsEconomyStatsRow {
+	place: number;
+	nation: string;
+	value: number;
+}
+
+/****************************** EVENT FILTERS ******************************/
 function onChangeFilters() {
 	log('onChangeFilters()');
 	var typeFilterValue = getEventFilterTypeValue();
@@ -1058,6 +1169,24 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 `;
 
 // *************** CLASSES ***************
+
+/**
+ * Helper class for central features of an extension,
+ * such as saving and retrieving data from local storage.
+ */
+class Confetti {
+	public static saveData<T>(key: string, data: T) {
+		localStorage.setItem(key, JSON.stringify(data));
+	}
+
+	public static getData<T>(key: string): T {
+		const data = localStorage.getItem(key);
+		if (data) {
+			return JSON.parse(data) as T;
+		}
+		return null;
+	}
+}
 
 class PopupWindow {
 	name: string;

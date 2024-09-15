@@ -62,6 +62,7 @@ function initExtensionPlay() {
     hideTutorialAdvisor();
     initExtensionMenuRow();
     initDiplomacyWindow();
+    NewsFeature.init();
 }
 function initDiplomacyWindow() {
     var dipBtn = document.getElementById('func_btn_diplomacy');
@@ -610,6 +611,89 @@ function parseSoftUnitUpgradesData() {
     _parsedSoftUpgradesData = result;
     return _parsedSoftUpgradesData;
 }
+class NewsFeature {
+    static init() {
+        log('NewsFeature.init');
+        CD.q('#func_btn_newspaper').addEventListener('click', NewsFeature.onOpenNewsWindow);
+    }
+    static onOpenNewsWindow() {
+        log('NewsFeature.onOpenNewsWindow');
+        var newsStatsEl = CD.q('#newspaper_statistics');
+        console.log('CONFETTI - newsStatsEl', newsStatsEl);
+        if (newsStatsEl) {
+            NewsFeature.checkNewsStatsText(newsStatsEl);
+        }
+        var newsPoupEl = CD.q('.func_dialog_content');
+        if (newsPoupEl) {
+            console.log('CONFETTI - newsPoupEl', newsPoupEl);
+            NewsFeature.createChangeObserver(newsPoupEl);
+        }
+    }
+    static checkNewsStatsText(el) {
+        const innerText = el.innerText;
+        if (innerText.indexOf('Largest Economies') >= 0) {
+            log('parse economics');
+            NewsFeature.parseNewsStats(innerText);
+        }
+        else {
+            log('not economics');
+        }
+    }
+    static parseNewsStats(innerText) {
+        var dataRaw = innerText.split('in units:')[1];
+        dataRaw = dataRaw.replaceAll(' tons.', '');
+        var dataRows = dataRaw.split('\n');
+        const day = NewsFeature.getNewsDay();
+        const existingData = Confetti.getData(NewsFeature.getKeyForDay(day));
+        if (existingData != null) {
+            log('Parsed econ data for day already exists');
+            return existingData;
+        }
+        const result = { day, rows: [] };
+        for (let row of dataRows) {
+            let parts = row.split(':');
+            if (parts.length < 3)
+                continue;
+            var place = parts[0].trim().replace(/\D/g, '');
+            var nation = parts[1].trim();
+            var value = parts[2].trim().replace(',', '');
+            result.rows.push({ place: +place, nation, value: +value });
+        }
+        log('saving news econ data for Day ' + day.toString());
+        log(result);
+        Confetti.saveData(NewsFeature.getKeyForDay(day), result);
+        return result;
+    }
+    static createChangeObserver(targetNode) {
+        const config = { attributes: false, childList: true };
+        const callback = function (mutationsList, observer) {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    log('A child node has been added or removed.');
+                    var newsStatsEl = CD.q('#newspaper_statistics');
+                    if (newsStatsEl) {
+                        NewsFeature.checkNewsStatsText(newsStatsEl);
+                    }
+                }
+            }
+        };
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+        log('setup News change observer');
+    }
+    static getNewsDay() {
+        var el = CD.q('#func_newspaper_day_tf');
+        const value = +el.value;
+        if (value === 0) {
+            throw new Error('Could not parse day from news window');
+        }
+        return value;
+    }
+    static getKeyForDay(day) {
+        return NewsFeature._dataKeyTemplate.replace('{0}', day.toString());
+    }
+}
+NewsFeature._dataKeyTemplate = 'confetti_news_econ_stats_day_{0}';
 function onChangeFilters() {
     log('onChangeFilters()');
     var typeFilterValue = getEventFilterTypeValue();
@@ -891,6 +975,18 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 }
 
 `;
+class Confetti {
+    static saveData(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+    static getData(key) {
+        const data = localStorage.getItem(key);
+        if (data) {
+            return JSON.parse(data);
+        }
+        return null;
+    }
+}
 class PopupWindow {
     constructor(name, openFunc) {
         this.name = name;
