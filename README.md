@@ -34,8 +34,14 @@ Note: The extension is designed for English language in the game. If you are usi
 
 - Events:
   - More detailed combat filters (ground / naval / air / missiles, wins / losses)
+  - Advanced Combat Report ("Digest"/summary) window with timeline
+- Units By B-Level:
+  - officers, seasonal as optional includes
+  - show other requirements (e.g. Recruiting Office, Secret Weapons Lab, including which level)
+- Menu:
+  - Force English language (so the extension always works properly)
+- If possible:
+  - Show city morale details right away
+  - Highlight changes in every research upgrade
   - Combat clarification (directions, e.g. I attacked X, or X attacked me - if possible)
-- Show city morale details right away (if possible)
-- Advanced Combat Report window
-- Units By B-Level - officers, seasonal as optional includes
-- Game Selector View: Force English language (so the extension works properly)
+- Re-enable the tutorial advisor in the top right if that becomes the way we access Missions in the future
