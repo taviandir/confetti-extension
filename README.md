@@ -25,6 +25,7 @@ Note: The extension is designed for English language in the game. If you are usi
 - Window showing Units by Building Level
 - Hide tutorial advisor in the top-right
 - Messages: CTRL-Enter to send message
+- News: Show diff from last report in "World's Largest Economies" (Stats window only)
 
 # Known issues
 
