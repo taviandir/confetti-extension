@@ -619,27 +619,91 @@ class NewsFeature {
     static onOpenNewsWindow() {
         log('NewsFeature.onOpenNewsWindow');
         var newsStatsEl = CD.q('#newspaper_statistics');
-        console.log('CONFETTI - newsStatsEl', newsStatsEl);
         if (newsStatsEl) {
             NewsFeature.checkNewsStatsText(newsStatsEl);
         }
         var newsPoupEl = CD.q('.func_dialog_content');
         if (newsPoupEl) {
-            console.log('CONFETTI - newsPoupEl', newsPoupEl);
             NewsFeature.createChangeObserver(newsPoupEl);
         }
     }
     static checkNewsStatsText(el) {
         const innerText = el.innerText;
         if (innerText.indexOf('Largest Economies') >= 0) {
-            log('parse economics');
-            NewsFeature.parseNewsStats(innerText);
+            const econStatsData = NewsFeature.parseEconomyStats(innerText);
+            NewsFeature.addDiffToEconomyStats(econStatsData);
         }
         else {
-            log('not economics');
+            log('not economics day');
         }
     }
-    static parseNewsStats(innerText) {
+    static addDiffToEconomyStats(dataNow) {
+        const dayNow = dataNow.day;
+        const dayPrev = dayNow - 3;
+        if (dayPrev <= 0)
+            return;
+        const keyPrev = NewsFeature.getKeyForDay(dayPrev);
+        const dataPrev = Confetti.getData(keyPrev);
+        if (dataPrev == null) {
+            log('No previous economy data found for day ' + dayPrev.toString());
+            return;
+        }
+        const diffResult = NewsFeature.calculateDiffEconomyStats(dataNow, dataPrev);
+        const parentEl = document.querySelector('#newspaper_statistics');
+        NewsFeature.injectDiffToEconomyStats(dataNow, diffResult, parentEl);
+    }
+    static injectDiffToEconomyStats(dataNow, diffResult, parentEl) {
+        let highestValueDiff = 0;
+        let highestValueDiffNation = '';
+        Object.keys(diffResult).forEach((key) => {
+            const row = diffResult[key];
+            if (!row.isNew && row.valueDiff > highestValueDiff) {
+                highestValueDiff = row.valueDiff;
+                highestValueDiffNation = key;
+            }
+        });
+        const textEl = parentEl.querySelector('.newspaper_information_article p');
+        var newlines = [...textEl.childNodes].filter((x) => x.nodeName === 'BR');
+        for (let i = 0; i < dataNow.rows.length; i++) {
+            let row = dataNow.rows[i];
+            let diffRow = diffResult[row.nation];
+            let isValueNeg = diffRow.valueDiff < 0;
+            let isPositionNeg = diffRow.placeDiff < 0;
+            let isHighestDiff = row.nation === highestValueDiffNation;
+            let valueDiffText = `${isValueNeg ? '-' : '+'}${Math.abs(diffRow.valueDiff).toLocaleString()}`;
+            let placeDiffText = `(${diffRow.isNew || diffRow.placeDiff === 0 ? '' : isPositionNeg ? '-' : '+'}${diffRow.isNew ? '*' : Math.abs(diffRow.placeDiff)}) ${isHighestDiff ? '🔥' : ''}`;
+            let idxTarget = i + 1;
+            if (i == 6) {
+                console.log('CONFETTI DEBUG', row, diffRow);
+            }
+            let spanEl = document.createElement('span');
+            spanEl.title = 'Diff from previous report. Format: Value (Position)';
+            spanEl.style.fontWeight = 'bold';
+            spanEl.style.float = 'right';
+            spanEl.style.marginRight = '16rem';
+            spanEl.innerText = valueDiffText + ' ' + placeDiffText;
+            newlines[idxTarget].before(spanEl);
+        }
+    }
+    static calculateDiffEconomyStats(dataNow, dataPrev) {
+        const diffRows = {};
+        for (let i = 0; i < dataNow.rows.length; i++) {
+            const rowNow = dataNow.rows[i];
+            const rowPrev = dataPrev.rows.find((x) => x.nation === rowNow.nation);
+            if (rowNow.nation.startsWith('Mekong')) {
+                console.log('CONFETTI DEBUG', rowNow, rowPrev);
+            }
+            const diffPlace = (rowPrev?.place ?? 0) - rowNow.place;
+            const diffValue = rowNow.value - (rowPrev?.value ?? 0);
+            diffRows[rowNow.nation] = {
+                placeDiff: diffPlace,
+                valueDiff: diffValue,
+                isNew: !rowPrev,
+            };
+        }
+        return diffRows;
+    }
+    static parseEconomyStats(innerText) {
         var dataRaw = innerText.split('in units:')[1];
         dataRaw = dataRaw.replaceAll(' tons.', '');
         var dataRows = dataRaw.split('\n');
@@ -671,7 +735,11 @@ class NewsFeature {
                 if (mutation.type === 'childList') {
                     log('A child node has been added or removed.');
                     var newsStatsEl = CD.q('#newspaper_statistics');
-                    if (newsStatsEl) {
+                    const now = new Date().getTime();
+                    const timeSinceLastEmit = now - NewsFeature.__lastObserverEmit;
+                    console.log('CONFETTI timeSinceLastEmit', timeSinceLastEmit);
+                    NewsFeature.__lastObserverEmit = now;
+                    if (newsStatsEl && timeSinceLastEmit > 250) {
                         NewsFeature.checkNewsStatsText(newsStatsEl);
                     }
                 }
@@ -684,8 +752,8 @@ class NewsFeature {
     static getNewsDay() {
         var el = CD.q('#func_newspaper_day_tf');
         const value = +el.value;
-        if (value === 0) {
-            throw new Error('Could not parse day from news window');
+        if (value === 0 || isNaN(value)) {
+            throw new Error('Could not parse day from News window');
         }
         return value;
     }
@@ -693,7 +761,8 @@ class NewsFeature {
         return NewsFeature._dataKeyTemplate.replace('{0}', day.toString());
     }
 }
-NewsFeature._dataKeyTemplate = 'confetti_news_econ_stats_day_{0}';
+NewsFeature._dataKeyTemplate = 'news-econ-stats_day{0}';
+NewsFeature.__lastObserverEmit = 0;
 function onChangeFilters() {
     log('onChangeFilters()');
     var typeFilterValue = getEventFilterTypeValue();
@@ -977,16 +1046,26 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
 `;
 class Confetti {
     static saveData(key, data) {
+        key = Confetti.getKeyPrefix() + key;
         localStorage.setItem(key, JSON.stringify(data));
     }
     static getData(key) {
+        key = Confetti.getKeyPrefix() + key;
         const data = localStorage.getItem(key);
         if (data) {
             return JSON.parse(data);
         }
         return null;
     }
+    static getGameId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('gameID');
+    }
+    static getKeyPrefix() {
+        return Confetti._keyPrefixTemplate.replace('{0}', Confetti.getGameId());
+    }
 }
+Confetti._keyPrefixTemplate = 'confetti_{0}_';
 class PopupWindow {
     constructor(name, openFunc) {
         this.name = name;

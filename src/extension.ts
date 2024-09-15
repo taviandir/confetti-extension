@@ -726,9 +726,9 @@ function parseSoftUnitUpgradesData() {
 	return _parsedSoftUpgradesData;
 }
 
-/****************************** EVENT FILTERS ******************************/
+/****************************** NEWS FEATURES ******************************/
 class NewsFeature {
-	private static _dataKeyTemplate = 'confetti_news_econ_stats_day_{0}';
+	private static _dataKeyTemplate = 'news-econ-stats_day{0}';
 
 	public static init() {
 		log('NewsFeature.init');
@@ -738,13 +738,11 @@ class NewsFeature {
 	private static onOpenNewsWindow() {
 		log('NewsFeature.onOpenNewsWindow');
 		var newsStatsEl = CD.q('#newspaper_statistics');
-		console.log('CONFETTI - newsStatsEl', newsStatsEl);
 		if (newsStatsEl) {
 			NewsFeature.checkNewsStatsText(newsStatsEl);
 		}
 		var newsPoupEl = CD.q('.func_dialog_content');
 		if (newsPoupEl) {
-			console.log('CONFETTI - newsPoupEl', newsPoupEl);
 			NewsFeature.createChangeObserver(newsPoupEl);
 		}
 	}
@@ -752,16 +750,105 @@ class NewsFeature {
 	private static checkNewsStatsText(el: HTMLElement) {
 		const innerText = el.innerText;
 		if (innerText.indexOf('Largest Economies') >= 0) {
-			log('parse economics');
-			NewsFeature.parseNewsStats(innerText);
+			const econStatsData = NewsFeature.parseEconomyStats(innerText);
+			NewsFeature.addDiffToEconomyStats(econStatsData);
 		} else {
-			log('not economics');
+			log('not economics day');
 		}
 	}
 
-	private static parseNewsStats(innerText: string) {
-		// TODO : this needs to take into consideration that we've injected
-		//        the diff data into the innerText?
+	private static addDiffToEconomyStats(dataNow: NewsEconomyStatsData) {
+		// detect if we have data for the previous occurrence
+		const dayNow = dataNow.day;
+		const dayPrev = dayNow - 3;
+		if (dayPrev <= 0) return;
+
+		const keyPrev = NewsFeature.getKeyForDay(dayPrev);
+		const dataPrev = Confetti.getData<NewsEconomyStatsData>(keyPrev);
+		if (dataPrev == null) {
+			log('No previous economy data found for day ' + dayPrev.toString());
+			return;
+		}
+
+		// detect if we've already injected the stats data
+		// NOTE : add an attr to parent element? e.g. data-confetti-diff-injected="1"
+		// TODO
+
+		// calculate diff
+		const diffResult = NewsFeature.calculateDiffEconomyStats(dataNow, dataPrev);
+
+		// inject diff
+		const parentEl = document.querySelector('#newspaper_statistics');
+		NewsFeature.injectDiffToEconomyStats(dataNow, diffResult, parentEl as HTMLElement);
+	}
+
+	private static injectDiffToEconomyStats(dataNow: NewsEconomyStatsData, diffResult: NewsEconomyStatsDiffResult, parentEl: HTMLElement) {
+		// determine highest value diff (not new)
+		let highestValueDiff = 0;
+		let highestValueDiffNation = '';
+		Object.keys(diffResult).forEach((key) => {
+			const row = diffResult[key];
+			if (!row.isNew && row.valueDiff > highestValueDiff) {
+				highestValueDiff = row.valueDiff;
+				highestValueDiffNation = key;
+			}
+		});
+
+		const textEl = parentEl.querySelector('.newspaper_information_article p') as HTMLElement;
+		var newlines = [...textEl.childNodes].filter((x) => x.nodeName === 'BR');
+
+		for (let i = 0; i < dataNow.rows.length; i++) {
+			let row = dataNow.rows[i];
+			let diffRow = diffResult[row.nation];
+			let isValueNeg = diffRow.valueDiff < 0;
+			let isPositionNeg = diffRow.placeDiff < 0;
+			let isHighestDiff = row.nation === highestValueDiffNation;
+
+			let valueDiffText = `${isValueNeg ? '-' : '+'}${Math.abs(diffRow.valueDiff).toLocaleString()}`;
+			let placeDiffText = `(${diffRow.isNew || diffRow.placeDiff === 0 ? '' : isPositionNeg ? '-' : '+'}${
+				diffRow.isNew ? '*' : Math.abs(diffRow.placeDiff)
+			}) ${isHighestDiff ? '🔥' : ''}`;
+			let idxTarget = i + 1;
+
+			if (i == 6) {
+				console.log('CONFETTI DEBUG', row, diffRow);
+			}
+
+			// insert span
+			let spanEl = document.createElement('span');
+			spanEl.title = 'Diff from previous report. Format: Value (Position)';
+			spanEl.style.fontWeight = 'bold';
+			// spanEl.style.marginLeft = '3rem';
+			spanEl.style.float = 'right';
+			spanEl.style.marginRight = '16rem';
+			spanEl.innerText = valueDiffText + ' ' + placeDiffText;
+			newlines[idxTarget].before(spanEl);
+		}
+	}
+
+	private static calculateDiffEconomyStats(dataNow: NewsEconomyStatsData, dataPrev: NewsEconomyStatsData): NewsEconomyStatsDiffResult {
+		const diffRows: NewsEconomyStatsDiffResult = {};
+		for (let i = 0; i < dataNow.rows.length; i++) {
+			const rowNow = dataNow.rows[i];
+			const rowPrev = dataPrev.rows.find((x) => x.nation === rowNow.nation);
+
+			if (rowNow.nation.startsWith('Mekong')) {
+				console.log('CONFETTI DEBUG', rowNow, rowPrev);
+			}
+
+			const diffPlace = (rowPrev?.place ?? 0) - rowNow.place;
+			const diffValue = rowNow.value - (rowPrev?.value ?? 0);
+
+			diffRows[rowNow.nation] = <NewsEconomyStatsDiffRow>{
+				placeDiff: diffPlace,
+				valueDiff: diffValue,
+				isNew: !rowPrev,
+			};
+		}
+		return diffRows;
+	}
+
+	private static parseEconomyStats(innerText: string) {
 		var dataRaw = innerText.split('in units:')[1];
 		dataRaw = dataRaw.replaceAll(' tons.', '');
 		var dataRows = dataRaw.split('\n');
@@ -781,7 +868,6 @@ class NewsFeature {
 			var place = parts[0].trim().replace(/\D/g, '');
 			var nation = parts[1].trim();
 			var value = parts[2].trim().replace(',', '');
-			// console.log('CONFETTI - row parsed', { place, nation, value });
 			result.rows.push(<NewsEconomyStatsRow>{ place: +place, nation, value: +value });
 		}
 
@@ -792,6 +878,7 @@ class NewsFeature {
 		return result;
 	}
 
+	private static __lastObserverEmit: number = 0;
 	private static createChangeObserver(targetNode: HTMLElement) {
 		const config = { attributes: false, childList: true };
 		const callback = function (mutationsList, observer) {
@@ -799,8 +886,12 @@ class NewsFeature {
 				if (mutation.type === 'childList') {
 					log('A child node has been added or removed.');
 					var newsStatsEl = CD.q('#newspaper_statistics');
-					// NOTE : this triggers twice on changes
-					if (newsStatsEl) {
+					// NOTE : this triggers twice on changes for some reason, guard against it
+					const now = new Date().getTime();
+					const timeSinceLastEmit = now - NewsFeature.__lastObserverEmit;
+					console.log('CONFETTI timeSinceLastEmit', timeSinceLastEmit);
+					NewsFeature.__lastObserverEmit = now;
+					if (newsStatsEl && timeSinceLastEmit > 250) {
 						NewsFeature.checkNewsStatsText(newsStatsEl);
 					}
 				}
@@ -814,8 +905,8 @@ class NewsFeature {
 	private static getNewsDay(): number {
 		var el = CD.q('#func_newspaper_day_tf') as HTMLInputElement;
 		const value = +el.value;
-		if (value === 0) {
-			throw new Error('Could not parse day from news window');
+		if (value === 0 || isNaN(value)) {
+			throw new Error('Could not parse day from News window');
 		}
 		return value;
 	}
@@ -835,6 +926,14 @@ interface NewsEconomyStatsRow {
 	nation: string;
 	value: number;
 }
+
+interface NewsEconomyStatsDiffRow {
+	placeDiff: number;
+	valueDiff: number;
+	isNew: boolean;
+}
+
+type NewsEconomyStatsDiffResult = { [country: string]: NewsEconomyStatsDiffRow };
 
 /****************************** EVENT FILTERS ******************************/
 function onChangeFilters() {
@@ -1011,6 +1110,7 @@ function addFreetextFilter(wrapper) {
 
 /************************ MISC METHODS *******************************/
 
+/** @deprecated use Confetti.getGameId() instead */
 function getGameId() {
 	const urlParams = new URLSearchParams(window.location.search);
 	return urlParams.get('gameID');
@@ -1175,16 +1275,29 @@ li.event-box-spyaction[data-agent-actor="ENEMY"][data-agent-outcome="N"] .event-
  * such as saving and retrieving data from local storage.
  */
 class Confetti {
+	private static _keyPrefixTemplate = 'confetti_{0}_';
+
 	public static saveData<T>(key: string, data: T) {
+		key = Confetti.getKeyPrefix() + key;
 		localStorage.setItem(key, JSON.stringify(data));
 	}
 
 	public static getData<T>(key: string): T {
+		key = Confetti.getKeyPrefix() + key;
 		const data = localStorage.getItem(key);
 		if (data) {
 			return JSON.parse(data) as T;
 		}
 		return null;
+	}
+
+	public static getGameId(): string | null {
+		const urlParams = new URLSearchParams(window.location.search);
+		return urlParams.get('gameID');
+	}
+
+	private static getKeyPrefix(): string {
+		return Confetti._keyPrefixTemplate.replace('{0}', Confetti.getGameId());
 	}
 }
 
