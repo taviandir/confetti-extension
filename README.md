@@ -51,5 +51,4 @@ Note: The extension is designed for English language in the game. If you are usi
 - Intel:
   - If possible: Clarify what units are shown when enemy's research is revealed (e.g. on mouse hover)
 - News:
-  - World economics save historic data (position, diff)
   - Detect what units other players have (by scraping the casuality reports and "cities conquered by X" and inferring what units it is, e.g. "14th Strike Wing" = Strike Fighters)
