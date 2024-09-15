@@ -548,6 +548,7 @@ function markFilterTypeOnEvents() {
 			'Trade Offer',
 			'received a message',
 		],
+		EXP: ['Experience gained'],
 	};
 
 	var eventElems = document.querySelectorAll<HTMLElement>('#eventsContainer .content .overview ul li');
@@ -688,7 +689,7 @@ function tryMatchUnitType(researchName) {
 // format: { [key: string]: string[] }
 // where key = unit type, and array = unit type names in the doctrines
 // e.g. { 'Attack Submarine': ['Los Angeles Class', ...]
-var _parsedUnitDoctrineData = null;
+var _parsedUnitDoctrineData: { [key: string]: string[] } = null;
 function parseUnitDoctrineData() {
 	if (_parsedUnitDoctrineData) {
 		return _parsedUnitDoctrineData;
@@ -716,7 +717,6 @@ function parseSoftUnitUpgradesData() {
 	for (let i = 0; i < rowSplit.length; i++) {
 		let rawRow = rowSplit[i];
 		let cols = rawRow.split('\t');
-		// let values = cols.filter(x => !!x && x.length);
 		let values = cols;
 		let unitType = values.shift();
 		result[unitType] = values;
@@ -772,6 +772,7 @@ function addTypeFilterSelect(elem) {
 	DomHelpers.addOptionToSelect('Research', 'RES', filterSelect);
 	DomHelpers.addOptionToSelect('City Production', 'CIT', filterSelect);
 	DomHelpers.addOptionToSelect('Diplomacy', 'DIP', filterSelect);
+	DomHelpers.addOptionToSelect('Experience', 'EXP', filterSelect);
 	filterSelect.addEventListener('change', onChangeFilters);
 	elem.append(wrapper);
 }

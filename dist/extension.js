@@ -9,7 +9,6 @@
         return;
     log('INIT');
     let correctUrl = document.location.href.includes('con-client');
-    console.log('CORRECT URL?', { correctUrl, href: document.location.href });
     if (!correctUrl)
         return;
     var splashScreen = document.getElementById('splashScreenContainer');
@@ -97,7 +96,7 @@ function initExtensionMenuRow() {
     menuWrapper.id = 'ExtMenu';
     menuWrapper.setAttribute('style', 'position: absolute; bottom: -80px; left: 0; width: 315px; z-index: 10; color: white; margin-left: 13px;');
     var ulEl = document.createElement('ul');
-    ulEl.classList.add('mainmenu');
+    CD.addClassToElement(ulEl, 'mainmenu');
     ulEl.setAttribute('style', 'display: grid; grid-template-columns: repeat(5, 1fr)');
     menuWrapper.appendChild(ulEl);
     insertAfter(menuWrapper, refElement);
@@ -358,7 +357,7 @@ function initOptionsInEventWindow() {
 function addClearUnreadButton(wrapper) {
     let btn = document.createElement('button');
     btn.innerText = 'Clear Unread';
-    btn.classList.add('con_button');
+    CD.addClassToElement(btn, 'con_button');
     btn.setAttribute('style', 'position: absolute; right: 5rem;');
     wrapper.appendChild(btn);
     btn.addEventListener('click', onClickButtonClearUnread);
@@ -373,7 +372,6 @@ function onClickButtonClearUnread() {
     }
 }
 function markUnreadEvents() {
-    console.log('Mark Unread Events', _unreadEvents);
     let childrenOfUl = document.querySelector('#eventsContainer .content .overview ul').children;
     for (var i = 0; i < _unreadEvents; i++) {
         var liElem = childrenOfUl[i];
@@ -442,19 +440,21 @@ const EventFilterTypeAttrName = 'data-filter-type';
 const EventEventTypeAttrName = 'data-event-type';
 function markFilterTypeOnEvents() {
     let filters = {
-        COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties'],
+        COM: ['Enemy Defeated', 'Fighting.', 'Friendly Unit Lost', 'Civilian Casualties', 'Firing', 'Taking damage'],
         TER: ['Province entered', 'City entered', 'Territory Lost', 'Territory Conquered'],
-        AGE: ['Agent'],
+        AGE: ['Agent', 'agent', 'agents'],
         RES: ['Research Completed'],
         CIT: ['built in', 'mobilized', 'produced in'],
         DIP: [
             'New Article Published',
             'Message Received',
             'Diplomatic Status Changed',
+            'declared war',
             'the coalition',
             'Trade Offer',
             'received a message',
         ],
+        EXP: ['Experience gained'],
     };
     var eventElems = document.querySelectorAll('#eventsContainer .content .overview ul li');
     for (let evEl of eventElems) {
@@ -470,7 +470,7 @@ function markFilterTypeOnEvents() {
     }
 }
 function getAllEventElements() {
-    return document.querySelectorAll('#eventsContainer .content .overview ul li');
+    return CD.qa('#eventsContainer .content .overview ul li');
 }
 function addOtherMarkersOnEvents() {
     var eventElems = getAllEventElements();
@@ -649,6 +649,7 @@ function addTypeFilterSelect(elem) {
     DomHelpers.addOptionToSelect('Research', 'RES', filterSelect);
     DomHelpers.addOptionToSelect('City Production', 'CIT', filterSelect);
     DomHelpers.addOptionToSelect('Diplomacy', 'DIP', filterSelect);
+    DomHelpers.addOptionToSelect('Experience', 'EXP', filterSelect);
     filterSelect.addEventListener('change', onChangeFilters);
     elem.append(wrapper);
 }
@@ -734,7 +735,6 @@ function detectCountriesInEvents() {
             return { key: s, value: toUpperCaseFirst(s) };
         }
     });
-    console.log('>>>>>> countries result', { result });
     result.sort((a, b) => (a.value < b.value ? -1 : 1));
     return result;
 }
@@ -915,6 +915,26 @@ class DomHelpers {
     }
 }
 const DomIds = {};
+class CD {
+    static getInputElementById(idSelector) {
+        return document.getElementById(idSelector);
+    }
+    static addOptionToSelect(displayName, value, parentElem) {
+        let node = document.createElement('option');
+        node.value = value;
+        node.innerText = displayName;
+        parentElem.appendChild(node);
+    }
+    static q(selector) {
+        return document.querySelector(selector);
+    }
+    static qa(selector) {
+        return document.querySelectorAll(selector);
+    }
+    static addClassToElement(el, className) {
+        el.classList.add(className);
+    }
+}
 class ResearchData {
 }
 ResearchData.UnitSoftUpgradesData = `Motorized Infantry		Engine Upgrade I	Man Portable Air Defense		Engine Upgrade II		Personal Armor
