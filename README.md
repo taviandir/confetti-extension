@@ -25,6 +25,7 @@ Note: The extension is designed for English language in the game. If you are usi
 - Window showing Units by Building Level
 - Hide tutorial advisor in the top-right
 - Messages: CTRL-Enter to send message
+- News: Show diff from last report in "World's Largest Economies" (Stats window only)
 
 # Known issues
 
@@ -50,5 +51,4 @@ Note: The extension is designed for English language in the game. If you are usi
 - Intel:
   - If possible: Clarify what units are shown when enemy's research is revealed (e.g. on mouse hover)
 - News:
-  - World economics save historic data (position, diff)
   - Detect what units other players have (by scraping the casuality reports and "cities conquered by X" and inferring what units it is, e.g. "14th Strike Wing" = Strike Fighters)
