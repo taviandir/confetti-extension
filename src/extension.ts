@@ -805,9 +805,9 @@ class NewsFeature {
 			let isHighestDiff = row.nation === highestValueDiffNation;
 
 			let valueDiffText = `${isValueNeg ? '-' : '+'}${Math.abs(diffRow.valueDiff).toLocaleString()}`;
-			let placeDiffText = `(${diffRow.isNew || diffRow.placeDiff === 0 ? '' : isPositionNeg ? '-' : '+'}${
-				diffRow.isNew ? '*' : Math.abs(diffRow.placeDiff)
-			}) ${isHighestDiff ? '🔥' : ''}`;
+			let placeDiffText = `${isHighestDiff ? '🔥' : ''} (${
+				diffRow.isNew || diffRow.placeDiff === 0 ? '' : isPositionNeg ? '-' : '+'
+			}${diffRow.isNew ? '*' : Math.abs(diffRow.placeDiff)})`;
 			let idxTarget = i + 1;
 
 			if (i == 6) {
